@@ -222,3 +222,62 @@ def test_run_writes_reports_and_report_rebuilds_them(tmp_path, capsys):
     (folder / "client-summary.md").unlink()
     assert main(["report", str(folder / "results.json")]) == 0
     assert (folder / "client-summary.md").exists()
+
+
+# ---------------------------------------------------------------- HTML and PDF
+from checks import html_report, pdf
+
+
+def test_html_reports_are_self_contained_and_escaped(tmp_path):
+    report = run(REQ, SNAP)
+    report["results"][0]["business_rule"] = "Rule with <script>alert(1)</script> & co"
+    for page in (html_report.client_html(report), html_report.consultant_html(report)):
+        assert page.startswith("<!DOCTYPE html>")
+        assert "<script>" not in page and "&lt;script&gt;" in page
+        assert "http://" not in page and "https://" not in page and "<link" not in page and "<img" not in page
+
+
+def test_client_html_speaks_business_language():
+    page = html_report.client_html(run(REQ, SNAP))
+    assert "Support tracks cases against an SLA." in page
+    assert "BR-01.1" not in page and "PermissionsCustomizeApplication" not in page
+    assert 'class="pill notmet"' in page
+
+
+def test_consultant_html_has_evidence_and_fixes():
+    page = html_report.consultant_html(run(REQ, SNAP))
+    assert "automations/workflow-rules.json" in page
+    assert "Migrate the workflow rules and Process Builder processes on Case to Flow" in page
+
+
+def test_run_writes_html_next_to_markdown(tmp_path):
+    snap_dir = tmp_path / "snapshots" / "fixture" / "t1"
+    shutil.copytree(SNAP, snap_dir)
+    assert main(["run", str(REQ), str(snap_dir)]) == 0
+    folder = tmp_path / "reports" / "fixture" / "t1"
+    assert (folder / "client-summary.html").exists() and (folder / "consultant-detail.html").exists()
+    assert not (folder / "client-summary.pdf").exists()
+
+
+def test_pdf_without_browser_explains(monkeypatch, tmp_path):
+    monkeypatch.setenv("ORG_ASSESSMENT_BROWSER", str(tmp_path / "no-such-browser.exe"))
+    assert pdf.find_browser() is None
+    with pytest.raises(RuntimeError, match="print it to PDF"):
+        pdf.to_pdf(tmp_path / "a.html", tmp_path / "a.pdf")
+
+
+def test_pdf_uses_headless_print(tmp_path):
+    calls = []
+
+    def fake_run(args, **kw):
+        calls.append(args)
+        Path(args[-2].split("=", 1)[1]).write_bytes(b"%PDF-1.4 fake")
+
+        class P:
+            stderr = b""
+        return P()
+    html = tmp_path / "r.html"
+    html.write_text("<html></html>", encoding="utf-8")
+    out = pdf.to_pdf(html, tmp_path / "r.pdf", browser="edge", run=fake_run)
+    assert out.read_bytes().startswith(b"%PDF")
+    assert "--headless" in calls[0] and calls[0][-1].startswith("file:")

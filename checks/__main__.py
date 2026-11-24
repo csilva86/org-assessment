@@ -1,10 +1,11 @@
 """
 Usage:
-    python -m checks run <requirements.yaml> <snapshot-folder> [--out <results.json>]
-    python -m checks report <results.json>
+    python -m checks run <requirements.yaml> <snapshot-folder> [--out <results.json>] [--pdf]
+    python -m checks report <results.json> [--pdf]
 
-`run` writes results.json and, next to it, the reports: client-summary.md,
-consultant-detail.md and gaps.json. `report` rebuilds the reports from an existing results.json.
+`run` writes results.json and, next to it, the reports: client-summary.md/.html,
+consultant-detail.md/.html and gaps.json (plus .pdf files with --pdf, printed by Edge or Chrome).
+`report` rebuilds the reports from an existing results.json.
 
 Default output: reports/<alias>/<timestamp>/results.json, mirroring the snapshot path
 (snapshots/<alias>/<timestamp>). `reports/` is git-ignored: results hold org data.
@@ -14,6 +15,8 @@ import json
 import sys
 from pathlib import Path
 
+from .html_report import write_html
+from .pdf import to_pdf
 from .report import write_all
 from .requirements import RequirementsError
 from .runner import run
@@ -30,6 +33,17 @@ def default_out(snapshot):
     return Path("reports") / Path(snapshot).name / "results.json"
 
 
+def write_reports(report, folder, pdf=False):
+    files = write_all(report, folder) + write_html(report, folder)
+    if pdf:
+        for html in [f for f in files if f.suffix == ".html"]:
+            try:
+                files.append(to_pdf(html, html.with_suffix(".pdf")))
+            except RuntimeError as e:
+                print(f"PDF not written for {html.name}: {e}", file=sys.stderr)
+    return files
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="python -m checks")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -37,8 +51,10 @@ def main(argv=None):
     r.add_argument("requirements")
     r.add_argument("snapshot")
     r.add_argument("--out")
+    r.add_argument("--pdf", action="store_true", help="also print the HTML reports to PDF")
     rp = sub.add_parser("report", help="rebuild the reports from an existing results.json")
     rp.add_argument("results")
+    rp.add_argument("--pdf", action="store_true", help="also print the HTML reports to PDF")
     args = parser.parse_args(argv)
 
     if args.command == "report":
@@ -47,7 +63,7 @@ def main(argv=None):
             print(f"Not found: {path}", file=sys.stderr)
             return 2
         report = json.loads(path.read_text(encoding="utf-8"))
-        for f in write_all(report, path.parent):
+        for f in write_reports(report, path.parent, args.pdf):
             print(f"Written: {f}")
         return 0
 
@@ -67,7 +83,7 @@ def main(argv=None):
     print(f"\n{c['met']} met · {c['partial']} partial · {c['not_met']} not met · "
           f"{c['needs_judgement']} need judgement · {c['error']} error(s)")
     print(f"Results: {out}")
-    for f in write_all(report, out.parent):
+    for f in write_reports(report, out.parent, args.pdf):
         print(f"Report:  {f}")
     return 0
 

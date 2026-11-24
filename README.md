@@ -82,8 +82,8 @@ flowchart LR
 3. **Analysis** — Python checks read the snapshot and return `met`, `partial` or `not_met`,
    with severity and evidence (`python -m checks run <requirements> <snapshot>`).
 4. **Output** — a client summary in business language, a consultant report with evidence and a
-   recommended fix per check, and `gaps.json`. All three are built by code, so the same results
-   always give the same reports.
+   recommended fix per check (Markdown and self-contained HTML, PDF with `--pdf`), and `gaps.json`.
+   All are built by code, so the same results always give the same reports.
 5. **Org documentation** — data dictionary, permission matrix, automation map, licenses and
    limits, plus a methodology appendix, built from the same snapshot.
 6. **Second brain** — anonymised patterns from past projects that make the next translation of
@@ -148,7 +148,8 @@ In Claude Code:
       plan, every command checked with the guardrail, clock timestamps, error logs, one safe retry
 - [x] Reports built by code from `results.json`: client summary (business language), consultant
       detail (evidence and recommended fix per check) and `gaps.json`
-- [ ] Reports as HTML/PDF for delivery
+- [x] Reports as self-contained HTML (no external resources) and PDF (`--pdf`, printed by Edge or
+      Chrome in headless mode, no PDF library needed)
 - [ ] Org documentation generator
 - [ ] Second brain: pattern format and approval flow
 - [ ] Later: hand `gaps.json` to an orchestrated development pipeline and re-run the assessment
