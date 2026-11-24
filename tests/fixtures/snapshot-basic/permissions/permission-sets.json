@@ -1,0 +1,44 @@
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "Id": "0PS1",
+        "Name": "Support_Agent",
+        "Label": "Support Agent",
+        "IsOwnedByProfile": false,
+        "Profile": null,
+        "PermissionsModifyAllData": false,
+        "PermissionsViewAllData": false,
+        "PermissionsAuthorApex": false,
+        "PermissionsManageUsers": false,
+        "PermissionsCustomizeApplication": false,
+        "PermissionsApiEnabled": true
+      },
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "Id": "0PS2",
+        "Name": "X00e000000ABC",
+        "Label": "00e000000ABC",
+        "IsOwnedByProfile": true,
+        "Profile": {
+          "Name": "Support Profile"
+        },
+        "PermissionsModifyAllData": false,
+        "PermissionsViewAllData": false,
+        "PermissionsAuthorApex": false,
+        "PermissionsManageUsers": false,
+        "PermissionsCustomizeApplication": true,
+        "PermissionsApiEnabled": true
+      }
+    ],
+    "totalSize": 2,
+    "done": true
+  },
+  "warnings": []
+}

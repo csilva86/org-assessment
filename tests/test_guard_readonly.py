@@ -16,16 +16,17 @@ import pytest
 HOOK = pathlib.Path(__file__).resolve().parents[1] / ".claude" / "hooks" / "guard_readonly.py"
 
 
-def run_hook(tool_name, tool_input):
-    event = {"hook_event_name": "PreToolUse", "tool_name": tool_name, "tool_input": tool_input}
+def run_hook(tool_name, tool_input, cwd="C:/Users/demo/OneDrive/Área de Trabalho/Página Empresa/OrgAssessment"):
+    # Claude Code sends UTF-8 JSON that includes the working folder, which may have accents.
+    event = {"hook_event_name": "PreToolUse", "tool_name": tool_name, "tool_input": tool_input, "cwd": cwd}
     result = subprocess.run(
-        [sys.executable, str(HOOK)], input=json.dumps(event), capture_output=True, text=True
+        [sys.executable, str(HOOK)], input=json.dumps(event, ensure_ascii=False).encode("utf-8"),
+        capture_output=True,
     )
-    return result.returncode, result.stderr
+    return result.returncode, result.stderr.decode("utf-8", errors="replace")
 
 
 ALLOWED = [
-    "sf org display --target-org demo --json",
     "sf org list limits --target-org demo --json",
     "sf org list metadata --metadata-type Flow --target-org demo --json",
     "sf org list metadata-types --target-org demo",
@@ -39,12 +40,12 @@ ALLOWED = [
     "sf data query --file queries/licenses-users/users.soql --target-org demo --json",
     "sf data query --file queries/automations/workflow-rules.tooling.soql --use-tooling-api --target-org demo --json",
     "sf --version",
+    "SF_LOG_LEVEL=debug sf org list limits -o demo",
     "sf --version 2>&1 | head -1",
     "sf org list limits --target-org demo --json 2>/dev/null > snapshots/demo/limits/limits.json",
     "sf data query --file queries/licenses-users/users.soql -o demo --json 2> /dev/null >snapshots/demo/users.json",
     "sf project deploy start --help",
     "sf org:list:limits -o demo",
-    "SF_LOG_LEVEL=debug sf org display -o demo",
     "python -m pytest tests",
     "git status",
     "ls snapshots",
@@ -74,6 +75,10 @@ BLOCKED = [
     "/usr/local/bin/sf project deploy start -o demo",
     "sf.cmd project deploy start -o demo",
     "sf some-new-command -o demo",
+    "sf org display --target-org demo --json",
+    "sf org display -o demo --verbose",
+    "sf org:display -o demo",
+    "sf org list auth",
     "sf project deploy start -o demo 2>&1",
     "sf project deploy start -o demo > out.json 2>&1",
     "sf --version 2>&1 && sf apex run -f x.apex -o demo",
@@ -115,5 +120,17 @@ def test_mcp_read_tools_are_allowed(tool):
 
 
 def test_unreadable_input_is_blocked():
-    result = subprocess.run([sys.executable, str(HOOK)], input="not json", capture_output=True, text=True)
+    result = subprocess.run([sys.executable, str(HOOK)], input=b"not json", capture_output=True)
     assert result.returncode == 2
+
+
+def test_accented_folder_does_not_break_the_hook():
+    code, err = run_hook("Bash", {"command": "sf org list limits -o demo"},
+                         cwd="C:/Usuários/José/Área de Trabalho/Página Empresa/Ação")
+    assert code == 0, err
+
+
+def test_credential_commands_explain_why():
+    code, err = run_hook("Bash", {"command": "sf org display -o demo --json"})
+    assert code == 2
+    assert "access token" in err and "organization.soql" in err

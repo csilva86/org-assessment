@@ -1,0 +1,49 @@
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "ParentId": "0PS1",
+        "SobjectType": "Case",
+        "PermissionsRead": true,
+        "PermissionsCreate": true,
+        "PermissionsEdit": true,
+        "PermissionsDelete": false,
+        "PermissionsViewAllRecords": false,
+        "PermissionsModifyAllRecords": false
+      },
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "ParentId": "0PS1",
+        "SobjectType": "Entitlement",
+        "PermissionsRead": true,
+        "PermissionsCreate": false,
+        "PermissionsEdit": false,
+        "PermissionsDelete": false,
+        "PermissionsViewAllRecords": false,
+        "PermissionsModifyAllRecords": false
+      },
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "ParentId": "0PS2",
+        "SobjectType": "Case",
+        "PermissionsRead": true,
+        "PermissionsCreate": false,
+        "PermissionsEdit": false,
+        "PermissionsDelete": false,
+        "PermissionsViewAllRecords": false,
+        "PermissionsModifyAllRecords": false
+      }
+    ],
+    "totalSize": 3,
+    "done": true
+  },
+  "warnings": []
+}

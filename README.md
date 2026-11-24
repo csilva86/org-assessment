@@ -12,9 +12,8 @@ pick up next.
 
 Part of the [CSLLABS](https://csllabs.com) portfolio · Salesforce × Claude Code line.
 
-> **Status: early stage.** The guardrails, the collector agents and the requirements format
-> are in place. The deterministic checks and the reports are the next steps (see
-> [Roadmap](#roadmap)).
+> **Status: early stage.** Guardrails, parallel collection and deterministic checks work end to
+> end on a Developer Edition org. Reports and org documentation are next (see [Roadmap](#roadmap)).
 
 ## Guardrails
 
@@ -23,7 +22,7 @@ asking the model nicely.
 
 | # | Guardrail | How it is enforced |
 | --- | --- | --- |
-| 1 | **Read-only.** The assessment never changes the org. | A `PreToolUse` hook ([`guard_readonly.py`](.claude/hooks/guard_readonly.py)) allows only an allowlist of read-only `sf` commands and blocks everything else, including chained commands, the legacy `sfdx` CLI, HTTP writes and write-like MCP tools. It fails closed. 57 tests cover it. |
+| 1 | **Read-only.** The assessment never changes the org. | A `PreToolUse` hook ([`guard_readonly.py`](.claude/hooks/guard_readonly.py)) allows only an allowlist of read-only `sf` commands and blocks everything else, including chained commands, the legacy `sfdx` CLI, HTTP writes, write-like MCP tools and commands that print credentials. It fails closed. 62 tests cover it. |
 | 2 | **Confidentiality between clients.** | `snapshots/` and `reports/` are git-ignored. The second brain stores patterns, never client data. |
 | 3 | **The consultant approves.** | Agents draft checks; nothing runs until the requirements file says `status: approved`. |
 | 4 | **Code before AI.** | Every check that can be exact is Python code with a reproducible result. AI is used only for judgement calls, and those are labelled. |
@@ -57,7 +56,7 @@ flowchart LR
    versioned [SOQL files](queries) in parallel, and save the raw JSON into a timestamped snapshot. Analysis never touches the live org, so
    results are reproducible and before/after runs can be compared.
 3. **Analysis** — Python checks read the snapshot and return `met`, `partial` or `not_met`,
-   with severity and evidence.
+   with severity and evidence (`python -m checks run <requirements> <snapshot>`).
 4. **Output** — a client summary, a consultant report and `gaps.json`.
 5. **Org documentation** — data dictionary, permission matrix, automation map, licenses and
    limits, plus a methodology appendix, built from the same snapshot.
@@ -74,10 +73,10 @@ flowchart LR
 | [`.claude/agents/`](.claude/agents) | Five collector subagents and the requirements translator |
 | [`.claude/skills/`](.claude/skills) | `run-assessment` (the `/run-assessment` command) and the read-only collection reference |
 | [`queries/`](queries) | The SOQL the collectors run, one query per file |
-| [`requirements/`](requirements) | Requirements format and a fictional example |
-| [`checks/`](checks) | Deterministic checks *(next step)* |
+| [`requirements/`](requirements) | Requirements format, a fictional example and the demo for the author's DigiLibrary org |
+| [`checks/`](checks) | Deterministic checks: six rule types, evidence for every result |
 | [`brain/`](brain) | The second brain: patterns only |
-| [`tests/`](tests) | Tests, starting with the guardrail |
+| [`tests/`](tests) | Guardrail and checks tests, on fictional data only |
 
 ## Getting started
 

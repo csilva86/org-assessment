@@ -1,11 +1,18 @@
 # checks/
 
-Deterministic checks (guardrail 4): Python code that reads a snapshot and returns
-`met`, `partial` or `not_met` with the evidence (snapshot file + path).
+Deterministic checks (guardrail 4): Python code that reads a snapshot and returns `met`,
+`partial` or `not_met` for each check, with the evidence that proves it (guardrail 5).
 
-**Not built yet.** This is the next step of the project:
+```bash
+python -m checks run requirements/<project>.yaml snapshots/<alias>/<timestamp>
+```
 
-1. a loader for the snapshot folder and the approved requirements file;
-2. one function per check type, starting with the checks in `requirements/example-support-sla.yaml`;
-3. `python -m checks run <requirements-file> <snapshot>` writing `results.json`;
-4. tests with a small fake snapshot in `tests/fixtures/` (fictional data only).
+| File | What it does |
+| --- | --- |
+| `requirements.py` | Loads a requirements file and refuses it unless `status: approved` with `approved_by` and `approved_on` (guardrail 3) |
+| `snapshot.py` | Reads the snapshot; a file that is missing, `failed`, `skipped` or holds an `sf` error gives `error`, never a verdict |
+| `rules.py` | The six rule types (see `requirements/README.md`) |
+| `runner.py` | Runs every check, keeps the link to its business rule, counts the results |
+| `__main__.py` | The command line; writes `reports/<alias>/<timestamp>/results.json` (git-ignored) |
+
+Tests: `tests/test_checks.py`, on the fictional snapshot in `tests/fixtures/` only.

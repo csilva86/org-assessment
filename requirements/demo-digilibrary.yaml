@@ -1,0 +1,96 @@
+# DEMO — requirements for the author's own Developer Edition org, which runs the DigiLibrary app
+# (https://github.com/csilva86/DigiLibrary). No client data. Used to show a real run end to end.
+project: demo-digilibrary
+status: approved
+approved_by: Carlos Silva
+approved_on: 2026-11-24
+
+rules:
+  - id: BR-01
+    business_rule: "The library team manages books and loans in Salesforce."
+    source: "DigiLibrary scope"
+    checks:
+      - id: BR-01.1
+        area: objects-config
+        what: "The Library Book and Library Book Loan objects exist."
+        how: code
+        severity: high
+        rule: {type: objects_exist, objects: [Library_Book__c, Library_Book_Loan__c]}
+        notes: ""
+      - id: BR-01.2
+        area: permissions
+        what: "Standard users can read, create and edit books."
+        how: code
+        severity: high
+        rule: {type: object_access, permission_sets: [Standard User], object: Library_Book__c, access: [read, create, edit]}
+        notes: "Assumes librarians use the Standard User profile. Confirm before approving."
+      - id: BR-01.3
+        area: permissions
+        what: "Standard users can read and create loans."
+        how: code
+        severity: high
+        rule: {type: object_access, permission_sets: [Standard User], object: Library_Book_Loan__c, access: [read, create]}
+        notes: ""
+      - id: BR-01.4
+        area: automations
+        what: "No legacy workflow rule or Process Builder process runs on loans."
+        how: code
+        severity: medium
+        rule: {type: no_legacy_automation, object: Library_Book_Loan__c, object_label: Library Book Loan}
+        notes: "Loan logic should live in Apex or Flow only."
+
+  - id: BR-02
+    business_rule: "Ten more librarians will join next quarter."
+    source: "Demo scenario"
+    checks:
+      - id: BR-02.1
+        area: licenses-users
+        what: "At least 10 Salesforce or Salesforce Platform licenses are free."
+        how: code
+        severity: high
+        rule: {type: licenses_available, licenses: [Salesforce, Salesforce Platform], min_available: 10}
+        notes: "Platform licenses are enough for custom apps such as DigiLibrary."
+
+  - id: BR-03
+    business_rule: "Support works cases against an SLA in the same org."
+    source: "Demo scenario"
+    checks:
+      - id: BR-03.1
+        area: objects-config
+        what: "Case, Entitlement and CaseMilestone exist."
+        how: code
+        severity: high
+        rule: {type: objects_exist, objects: [Case, Entitlement, CaseMilestone]}
+        notes: ""
+      - id: BR-03.2
+        area: permissions
+        what: "The support profile has no admin-level permissions."
+        how: code
+        severity: medium
+        rule: {type: system_permissions_absent, permission_sets: ["Custom: Support Profile"], permissions: [PermissionsModifyAllData, PermissionsCustomizeApplication, PermissionsManageUsers]}
+        notes: ""
+      - id: BR-03.3
+        area: permissions
+        what: "The permissions given to support agents fit their role."
+        how: judgement
+        severity: medium
+        notes: "Reviewed by the consultant."
+
+  - id: BR-04
+    business_rule: "Integrations will call the org every day."
+    source: "Demo scenario"
+    checks:
+      - id: BR-04.1
+        area: limits
+        what: "Daily API requests are below 70% used."
+        how: code
+        severity: low
+        rule: {type: limit_usage_below, limit: DailyApiRequests, max_percent: 70}
+        notes: ""
+      - id: BR-04.2
+        area: limits
+        what: "Data storage is below 50% used."
+        how: code
+        severity: medium
+        rule: {type: limit_usage_below, limit: DataStorageMB, max_percent: 50}
+        notes: "Developer Edition orgs have only 5 MB."

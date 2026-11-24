@@ -1,0 +1,16 @@
+{
+  "area": "limits",
+  "org_alias": "fixture",
+  "snapshot": "tests/fixtures/snapshot-basic",
+  "collected_by": "collector-limits",
+  "files": [
+    {
+      "file": "limits.json",
+      "command": "(fixture)",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "area": "objects-config",
+  "org_alias": "fixture",
+  "snapshot": "tests/fixtures/snapshot-basic",
+  "collected_by": "collector-objects-config",
+  "files": [
+    {
+      "file": "sobjects.json",
+      "command": "(fixture)",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "error": null
+    }
+  ]
+}

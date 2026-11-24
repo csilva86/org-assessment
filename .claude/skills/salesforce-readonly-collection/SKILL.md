@@ -26,9 +26,36 @@ sf data query --file queries/<area>/<name>.soql --target-org <alias> --json > <s
   is valid JSON with `"status": 0`. Anything else is recorded as failed in the manifest.
 - To add a query, add a `.soql` file to the area's folder. Do not invent queries at run time.
 
-> Status: the `licenses-users` query on `UserLicense` was confirmed on a Developer Edition org
-> (2026-11-23). The rest were written from the Salesforce object reference and are confirmed on
-> the first full run.
+> Status: every query and command below was confirmed on a Developer Edition org on
+> 2026-11-23 (16 of 16 `ok`).
+
+## Manifest format (the same for every collector)
+
+`<snapshot>/<area>/_manifest.json` — the checks read it, so keep exactly these keys:
+
+```json
+{
+  "area": "permissions",
+  "org_alias": "<alias>",
+  "snapshot": "snapshots/<alias>/<timestamp>",
+  "collected_by": "collector-permissions",
+  "files": [
+    {
+      "file": "permission-sets.json",
+      "command": "<the exact command that ran>",
+      "ran_at": "2026-11-24T13:05:12Z",
+      "status": "ok",
+      "records": 192,
+      "error": null
+    }
+  ]
+}
+```
+
+- `status`: `ok` (valid JSON with `"status": 0`), `failed` (anything else) or `skipped`
+  (not run on purpose, e.g. describes without approved requirements; say why in `error`).
+- `ran_at`: ISO 8601 in UTC. `records`: number of records, or `null` when not a list.
+- A check that needs a `failed` or `skipped` file reports `error`, never a verdict.
 
 ## Per area
 

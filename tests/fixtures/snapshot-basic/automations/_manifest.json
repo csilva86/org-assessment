@@ -1,0 +1,24 @@
+{
+  "area": "automations",
+  "org_alias": "fixture",
+  "snapshot": "tests/fixtures/snapshot-basic",
+  "collected_by": "collector-automations",
+  "files": [
+    {
+      "file": "workflow-rules.json",
+      "command": "(fixture)",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "error": null
+    },
+    {
+      "file": "flows.json",
+      "command": "(fixture)",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "error": null
+    }
+  ]
+}

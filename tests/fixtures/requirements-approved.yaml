@@ -1,0 +1,61 @@
+# Fixture for tests: a fictional, already approved requirements file.
+project: fixture-support
+status: approved
+approved_by: Test Consultant
+approved_on: 2026-11-24
+rules:
+  - id: BR-01
+    business_rule: "Support tracks cases against an SLA."
+    source: "fixture"
+    checks:
+      - id: BR-01.1
+        area: objects-config
+        what: "Case and Entitlement exist."
+        how: code
+        severity: high
+        rule: {type: objects_exist, objects: [Case, Entitlement]}
+      - id: BR-01.2
+        area: objects-config
+        what: "Entitlement management objects exist."
+        how: code
+        severity: high
+        rule: {type: objects_exist, objects: [Entitlement, CaseMilestone]}
+      - id: BR-01.3
+        area: permissions
+        what: "Support can read and edit cases."
+        how: code
+        severity: high
+        rule: {type: object_access, permission_sets: [Support_Agent, Support Profile], object: Case, access: [read, edit]}
+      - id: BR-01.4
+        area: automations
+        what: "No legacy automation on Case."
+        how: code
+        severity: medium
+        rule: {type: no_legacy_automation, object: Case}
+  - id: BR-02
+    business_rule: "Fifty agents work cases."
+    source: "fixture"
+    checks:
+      - id: BR-02.1
+        area: licenses-users
+        what: "Enough licenses."
+        how: code
+        severity: high
+        rule: {type: licenses_available, licenses: [Salesforce, Service Cloud User], min_available: 50}
+      - id: BR-02.2
+        area: limits
+        what: "API usage below 70%."
+        how: code
+        severity: low
+        rule: {type: limit_usage_below, limit: DailyApiRequests, max_percent: 70}
+      - id: BR-02.3
+        area: permissions
+        what: "No admin-level permissions for support."
+        how: code
+        severity: medium
+        rule: {type: system_permissions_absent, permission_sets: [Support_Agent, Support Profile], permissions: [PermissionsModifyAllData, PermissionsCustomizeApplication]}
+      - id: BR-02.4
+        area: permissions
+        what: "Permissions fit the role."
+        how: judgement
+        severity: medium

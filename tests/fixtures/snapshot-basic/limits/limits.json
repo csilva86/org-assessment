@@ -1,0 +1,16 @@
+{
+  "status": 0,
+  "result": [
+    {
+      "name": "DailyApiRequests",
+      "max": 15000,
+      "remaining": 14000
+    },
+    {
+      "name": "DataStorageMB",
+      "max": 5,
+      "remaining": 1
+    }
+  ],
+  "warnings": []
+}

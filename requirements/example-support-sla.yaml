@@ -14,24 +14,28 @@ rules:
         what: "The Case object is available in the org."
         how: code
         severity: high
+        rule: {type: objects_exist, objects: [Case]}
         notes: ""
       - id: BR-01.2
         area: objects-config
         what: "Entitlement management is enabled (the Entitlement and CaseMilestone objects exist)."
         how: code
         severity: high
+        rule: {type: objects_exist, objects: [Entitlement, CaseMilestone]}
         notes: "Entitlements must be switched on in Setup before these objects appear."
       - id: BR-01.3
         area: permissions
-        what: "The support agents' permission sets give Read and Edit on Case and Read on Entitlement."
+        what: "The support agents' permission sets give Read and Edit on Case."
         how: code
         severity: high
+        rule: {type: object_access, permission_sets: [Support_Agent], object: Case, access: [read, edit]}
         notes: "Which permission sets belong to support agents is confirmed by the consultant."
       - id: BR-01.4
         area: automations
         what: "No active legacy workflow rule or Process Builder process runs on Case."
         how: code
         severity: medium
+        rule: {type: no_legacy_automation, object: Case}
         notes: "Legacy automations on Case should be migrated to Flow before SLA processes are added."
 
   - id: BR-02
@@ -43,12 +47,14 @@ rules:
         what: "At least 50 user licenses that allow working cases are available (total minus used)."
         how: code
         severity: high
+        rule: {type: licenses_available, licenses: [Salesforce, Service Cloud User], min_available: 50}
         notes: "Which license types count is confirmed by the consultant."
       - id: BR-02.2
         area: limits
         what: "Daily API requests have room for the expected integrations (less than 70% used)."
         how: code
         severity: low
+        rule: {type: limit_usage_below, limit: DailyApiRequests, max_percent: 70}
         notes: "70% is an example threshold."
       - id: BR-02.3
         area: permissions

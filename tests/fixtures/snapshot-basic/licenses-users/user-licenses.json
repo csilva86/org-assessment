@@ -1,0 +1,32 @@
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "Id": "100A",
+        "Name": "Salesforce",
+        "Status": "Active",
+        "TotalLicenses": 10,
+        "UsedLicenses": 8,
+        "LicenseDefinitionKey": "SFDC"
+      },
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "Id": "100B",
+        "Name": "Salesforce Platform",
+        "Status": "Active",
+        "TotalLicenses": 5,
+        "UsedLicenses": 5,
+        "LicenseDefinitionKey": "AUL"
+      }
+    ],
+    "totalSize": 2,
+    "done": true
+  },
+  "warnings": []
+}

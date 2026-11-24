@@ -1,0 +1,24 @@
+{
+  "area": "permissions",
+  "org_alias": "fixture",
+  "snapshot": "tests/fixtures/snapshot-basic",
+  "collected_by": "collector-permissions",
+  "files": [
+    {
+      "file": "permission-sets.json",
+      "command": "(fixture)",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "error": null
+    },
+    {
+      "file": "object-permissions.json",
+      "command": "(fixture)",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "error": null
+    }
+  ]
+}

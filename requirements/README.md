@@ -3,7 +3,7 @@
 One YAML file per project: `requirements/<project>.yaml`. It holds the client's business
 rules and, under each rule, the technical checks that prove whether the org meets it.
 
-> Status: first draft of the format. It will change as the first checks are built.
+> Status: v1. Six rule types; more are added as projects need them.
 
 ## Who writes what
 
@@ -33,8 +33,33 @@ rules:
         what: "<what is verified, in plain words>"
         how: code              # code (exact, reproducible) | judgement (needs a person-like assessment)
         severity: high         # high | medium | low
+        rule: {type: objects_exist, objects: [Case]}   # required when how: code (see below)
         notes: ""              # assumptions, open questions
 ```
+
+## Rule types (`how: code`)
+
+Each rule reads only the snapshot (`checks/rules.py`). Names are API names unless said otherwise.
+
+| `type` | Parameters | Met when |
+| --- | --- | --- |
+| `objects_exist` | `objects: [Case, Library_Book__c]` | every object exists |
+| `licenses_available` | `licenses: [Salesforce, Service Cloud User]` (user license names or permission set license labels), `min_available: 50` | unused licenses (total minus used), summed, reach `min_available` |
+| `object_access` | `permission_sets: [Support_Agent, Standard User]` (permission set API name or label, or profile name), `object: Case`, `access: [read, create, edit, delete, view_all, modify_all]` | every permission set grants every access |
+| `system_permissions_absent` | `permission_sets: [...]`, `permissions: [PermissionsModifyAllData, PermissionsCustomizeApplication]` | none of them has any of those permissions |
+| `no_legacy_automation` | `object: Case`, optional `object_label: Case` | no workflow rule and no active Process Builder process on the object |
+| `limit_usage_below` | `limit: DailyApiRequests`, `max_percent: 70` | usage is below the threshold |
+
+`partial` means some, not all, of the items passed. A missing or failed snapshot file gives
+`error`, never a verdict. `how: judgement` checks are listed as `needs_judgement` for the consultant.
+
+## Running
+
+```bash
+python -m checks run requirements/<project>.yaml snapshots/<alias>/<timestamp>
+```
+
+Results go to `reports/<alias>/<timestamp>/results.json` (git-ignored).
 
 ## Results
 

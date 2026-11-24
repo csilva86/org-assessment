@@ -1,0 +1,22 @@
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "Id": "0PL1",
+        "MasterLabel": "Service Cloud User",
+        "DeveloperName": "ServiceCloudUser",
+        "Status": "Active",
+        "TotalLicenses": 3,
+        "UsedLicenses": 1,
+        "ExpirationDate": null
+      }
+    ],
+    "totalSize": 1,
+    "done": true
+  },
+  "warnings": []
+}

@@ -9,6 +9,7 @@ How it decides:
 - `sf` commands are checked against an ALLOWLIST of read-only commands. Anything not on the
   list is blocked, so a new or unknown command is blocked by default (fail closed).
 - `sfdx` (the legacy CLI) is always blocked: use `sf`.
+- `sf org display` and `sf org list auth` are blocked too: they only read, but they print credentials.
 - Raw HTTP calls to Salesforce hosts are blocked unless they are plain GET requests.
 - MCP tools whose name suggests a write (deploy, create, update, delete...) are blocked.
 
@@ -23,8 +24,15 @@ import sys
 
 # `sf` commands that only read from the org (or only change local files).
 # Each entry is the sequence of subcommand words after `sf`.
+# Commands that read but would expose credentials. Checked before the allowlist.
+CREDENTIAL_SF_COMMANDS = {
+    ("org", "display"): "`sf org display` prints the org's access token. To confirm which org this is, "
+                        "query the Organization record: `sf data query --file "
+                        "queries/objects-config/organization.soql --target-org <alias> --json`.",
+    ("org", "list", "auth"): "`sf org list auth` lists stored credentials.",
+}
+
 READ_ONLY_SF_COMMANDS = [
-    ("org", "display"),
     ("org", "list", "limits"),
     ("org", "list", "metadata-types"),
     ("org", "list", "metadata"),
@@ -57,9 +65,29 @@ def block(reason: str) -> None:
     sys.exit(2)
 
 
+# Shell redirections are not part of the command: `2>&1`, `>out.json`, `2> /dev/null`, `< in.txt`
+REDIRECT_WITH_TARGET = re.compile(r"^\d*(>>?|<)$")          # `>` or `2>` followed by a separate target
+REDIRECT_JOINED = re.compile(r"^\d*(>>?|<)(&\d+|.+)$")     # `2>&1`, `>out.json`, `2>/dev/null`
+
+
+def strip_redirections(words: list) -> list:
+    kept, skip_next = [], False
+    for w in words:
+        if skip_next:
+            skip_next = False
+            continue
+        if REDIRECT_WITH_TARGET.match(w):
+            skip_next = True
+            continue
+        if REDIRECT_JOINED.match(w):
+            continue
+        kept.append(w)
+    return kept
+
+
 def words_of(segment: str) -> list:
     try:
-        return shlex.split(segment, posix=True)
+        return strip_redirections(shlex.split(segment, posix=True))
     except ValueError:
         # Unbalanced quotes or similar: we cannot read it reliably, so do not trust it.
         return None
@@ -77,6 +105,10 @@ def check_sf(words: list, segment: str) -> None:
     # Also accept the colon style: `sf org:list:limits`
     if ":" in subcommands[0]:
         subcommands = subcommands[0].split(":") + subcommands[1:]
+
+    for words_, reason in CREDENTIAL_SF_COMMANDS.items():
+        if tuple(subcommands[: len(words_)]) == words_:
+            block(f"{reason} (guardrail 2: credentials never go into the transcript)")
 
     for allowed in READ_ONLY_SF_COMMANDS:
         if tuple(subcommands[: len(allowed)]) == allowed:
@@ -137,7 +169,9 @@ def check_mcp(tool_name: str) -> None:
 
 def main() -> None:
     try:
-        event = json.load(sys.stdin)
+        # Read bytes and decode as UTF-8 ourselves: on Windows, sys.stdin uses the local code page
+        # (cp1252), which cannot read paths such as "Área de Trabalho".
+        event = json.loads(sys.stdin.buffer.read().decode("utf-8"))
     except Exception:
         block("could not read the hook input.")
         return
