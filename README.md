@@ -13,19 +13,20 @@ pick up next.
 Part of the [CSLLABS](https://csllabs.com) portfolio · Salesforce × Claude Code line.
 
 > **Status: early stage.** Guardrails, parallel collection and deterministic checks work end to
-> end on a Developer Edition org, with reports for the client and the consultant and the org
-> documentation. The second brain is next (see [Roadmap](#roadmap)).
+> end on a Developer Edition org, with reports for the client and the consultant, the org
+> documentation and a second brain that keeps anonymised patterns between projects
+> (see [Roadmap](#roadmap)).
 
 ## Guardrails
 
-These five rules shape every part of the project. The first one is enforced by code, not by
+These five rules shape every part of the project. The first three are enforced by code, not by
 asking the model nicely.
 
 | # | Guardrail | How it is enforced |
 | --- | --- | --- |
 | 1 | **Read-only.** The assessment never changes the org. | A `PreToolUse` hook ([`guard_readonly.py`](.claude/hooks/guard_readonly.py)) allows only an allowlist of read-only `sf` commands and blocks everything else, including chained commands, the legacy `sfdx` CLI, HTTP writes, write-like MCP tools and commands that print credentials. It fails closed. 62 tests cover it. `python -m collect`, which runs `sf` outside the hook, checks every command with the same function. |
-| 2 | **Confidentiality between clients.** | `snapshots/` and `reports/` are git-ignored. The second brain stores patterns, never client data. |
-| 3 | **The consultant approves.** | Agents draft checks; nothing runs until the requirements file says `status: approved`. |
+| 2 | **Confidentiality between clients.** | `snapshots/` and `reports/` are git-ignored. The second brain stores patterns, never client data: `python -m brain check` blocks record ids, emails, org addresses, custom API names, numbers in rules and every name it finds in the local snapshots and requirements. Proposals are git-ignored until approved. |
+| 3 | **The consultant approves.** | Agents draft checks; nothing runs until the requirements file says `status: approved`. Patterns enter the second brain only through `python -m brain approve`, which a second hook ([`guard_brain.py`](.claude/hooks/guard_brain.py)) keeps out of Claude's reach and which needs a person at the terminal to type the pattern id. |
 | 4 | **Code before AI.** | Every check that can be exact is Python code with a reproducible result. AI is used only for judgement calls, and those are labelled. |
 | 5 | **Every conclusion has evidence.** | Each result points to the snapshot file and path that proves it. |
 
@@ -88,25 +89,28 @@ flowchart LR
    object, field by field), permission matrix, admin-level permissions with the number of users
    holding them, automation map per object, licenses and users (counted, never named), limits and
    a methodology appendix that traces every section to the file and command it came from.
-6. **Second brain** — anonymised patterns from past projects that make the next translation of
-   business rules faster.
+6. **Second brain** — at the end of a project, `/propose-patterns` drafts up to three anonymised
+   patterns (business rule → checks, recurring gaps, lessons). The consultant approves each one in
+   their own terminal; the `requirements-translator` uses the approved ones on the next project.
+   See [`brain/README.md`](brain/README.md).
 
 ## What is in this repository
 
 | Path | What it is |
 | --- | --- |
 | [`CLAUDE.md`](CLAUDE.md) | Instructions Claude Code reads in every session: guardrails, run order, conventions |
-| [`.claude/settings.json`](.claude/settings.json) | The read-only hook and a deny list for write commands |
+| [`.claude/settings.json`](.claude/settings.json) | The two hooks and a deny list for write commands |
 | [`.claude/hooks/guard_readonly.py`](.claude/hooks/guard_readonly.py) | Guardrail 1, in code |
+| [`.claude/hooks/guard_brain.py`](.claude/hooks/guard_brain.py) | Guardrail 3 for the second brain: only the consultant approves patterns |
 | [`.claude/agents/`](.claude/agents) | Five collector subagents and the requirements translator |
-| [`.claude/skills/`](.claude/skills) | `run-assessment` (the `/run-assessment` command) and the read-only collection reference |
+| [`.claude/skills/`](.claude/skills) | `run-assessment` and `propose-patterns` (slash commands) and the read-only collection reference |
 | [`collect/`](collect) | `python -m collect`: runs an area's read-only commands and writes the snapshot and manifest |
 | [`orgdoc/`](orgdoc) | `python -m orgdoc build`: the org documentation, from a snapshot |
 | [`queries/`](queries) | The SOQL the collectors run, one query per file |
 | [`requirements/`](requirements) | Requirements format, a fictional example and the demo for the author's DigiLibrary org |
 | [`checks/`](checks) | Deterministic checks: six rule types, evidence for every result |
-| [`brain/`](brain) | The second brain: patterns only |
-| [`tests/`](tests) | Guardrail, collection, checks, reports and documentation tests, on fictional data and a fake `sf` only |
+| [`brain/`](brain) | The second brain: pattern format, client-data scan, `python -m brain check / list / approve`, approved patterns |
+| [`tests/`](tests) | Guardrail, collection, checks, reports, documentation and second-brain tests, on fictional data and a fake `sf` only |
 
 ## Getting started
 
@@ -131,6 +135,8 @@ In Claude Code:
 1. Ask the `requirements-translator` agent to draft checks for your rules, review them, and set
    `status: approved`.
 2. Run `/run-assessment requirements/<your-file>.yaml demo`.
+3. At the end of the project, run `/propose-patterns requirements/<your-file>.yaml <results.json>`
+   and approve the patterns you want to keep with `python -m brain approve`, in your own terminal.
 
 > The hook is started with `python`. If your system only has `python3`, change `command` in
 > `.claude/settings.json`.
@@ -156,7 +162,8 @@ In Claude Code:
 - [x] Org documentation generated by code (`python -m orgdoc build`): data dictionary, permission
       matrix, admin-level permissions, automation map, licenses and users (counted, never named),
       limits and a methodology appendix
-- [ ] Second brain: pattern format and approval flow
+- [x] Second brain: pattern format (rule → checks, recurring gap, lesson), client-data scan,
+      approval by the consultant only (hook plus interactive `python -m brain approve`)
 - [ ] Later: hand `gaps.json` to an orchestrated development pipeline and re-run the assessment
       to prove the gaps are closed
 

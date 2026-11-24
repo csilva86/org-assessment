@@ -3,6 +3,9 @@ snapshots/*
 !snapshots/.gitkeep
 reports/*
 !reports/.gitkeep
+# Second-brain proposals are drafts: only approved patterns are committed
+brain/proposals/*
+!brain/proposals/.gitkeep
 
 # Salesforce CLI local state
 .sf/

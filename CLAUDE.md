@@ -12,10 +12,14 @@ requirements, and documents the org. It never changes the org.
 2. **Confidentiality between clients.** Data from one client never goes into another client's
    work, into `brain/`, into commits or into examples. `snapshots/` and `reports/` are
    git-ignored and stay on this machine. `brain/` holds patterns only: no client names, user
-   names, emails, record ids, numbers or settings of a specific org.
+   names, emails, record ids, numbers or settings of a specific org. `python -m brain check`
+   scans for them; use placeholders such as `<custom_object>`.
 3. **The consultant approves.** You may draft the translation of business rules into checks.
    No check runs until the consultant has approved the requirements file
-   (`status: approved`).
+   (`status: approved`). The same goes for the second brain: you write proposals to
+   `brain/proposals/`; only the consultant runs `python -m brain approve`, in their own terminal.
+   `.claude/hooks/guard_brain.py` blocks you from writing to `brain/patterns/` and from running
+   `approve`.
 4. **Code before AI.** Every check that can be exact is written as code in `checks/` and gives
    the same result every time. You judge only what code cannot decide, and you mark those
    results as `judgement`.
@@ -43,8 +47,10 @@ requirements, and documents the org. It never changes the org.
 5. **Org documentation** — `python -m orgdoc build <snapshot>`: overview, licenses and users (counted,
    never named), data dictionary, permission matrix, automation map, limits, and a methodology
    appendix, from the same snapshot.
-6. **Second brain** — after a project, propose anonymised patterns for `brain/`. The
-   consultant approves them before they are saved.
+6. **Second brain** — after a project, `/propose-patterns <requirements> <results.json>` drafts
+   up to three anonymised patterns in `brain/proposals/` and scans them (`python -m brain check`).
+   The consultant approves each one with `python -m brain approve` or deletes it. The
+   `requirements-translator` reads the approved patterns (`python -m brain list`).
 
 ## Conventions
 
