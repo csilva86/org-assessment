@@ -2,22 +2,42 @@
   "area": "automations",
   "org_alias": "fixture",
   "snapshot": "tests/fixtures/snapshot-basic",
-  "collected_by": "collector-automations",
+  "collected_by": "python -m collect",
   "files": [
     {
-      "file": "workflow-rules.json",
-      "command": "(fixture)",
+      "file": "apex-classes.json",
+      "command": "(fixture) apex-classes.json",
       "ran_at": "2026-11-24T00:00:00Z",
       "status": "ok",
       "records": 0,
+      "attempts": 1,
+      "error": null
+    },
+    {
+      "file": "apex-triggers.json",
+      "command": "(fixture) apex-triggers.json",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "attempts": 1,
       "error": null
     },
     {
       "file": "flows.json",
-      "command": "(fixture)",
+      "command": "(fixture) flows.json",
       "ran_at": "2026-11-24T00:00:00Z",
       "status": "ok",
       "records": 0,
+      "attempts": 1,
+      "error": null
+    },
+    {
+      "file": "workflow-rules.json",
+      "command": "(fixture) workflow-rules.json",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "attempts": 1,
       "error": null
     }
   ]

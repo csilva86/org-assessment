@@ -11,12 +11,13 @@ run it once and report what it says.
 Run exactly this, with the alias and the snapshot folder from the request:
 
 ```
-python -m collect area objects-config --alias <alias> --snapshot <snapshot> --objects <A,B,...>
+python -m collect area objects-config --alias <alias> --snapshot <snapshot> --objects <A,B,...> --describe-custom
 ```
 
 The request lists the objects to describe (`/run-assessment` takes them from the approved
 requirements). Pass them, comma-separated, to `--objects`. If the request lists none, leave
-`--objects` out: the script records the describes as `skipped`, which is expected.
+`--objects` out. Always keep `--describe-custom`: it also describes every custom object in the org,
+for the org documentation.
 
 The script runs the area's read-only `sf` commands, checks each one with the read-only guardrail
 before running it, and writes the data, the `.stderr.log` files and `_manifest.json` itself.

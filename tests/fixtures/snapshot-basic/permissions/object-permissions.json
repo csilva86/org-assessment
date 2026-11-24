@@ -40,9 +40,22 @@
         "PermissionsDelete": false,
         "PermissionsViewAllRecords": false,
         "PermissionsModifyAllRecords": false
+      },
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "ParentId": "0PS1",
+        "SobjectType": "Library_Book__c",
+        "PermissionsRead": true,
+        "PermissionsCreate": true,
+        "PermissionsEdit": true,
+        "PermissionsDelete": false,
+        "PermissionsViewAllRecords": false,
+        "PermissionsModifyAllRecords": false
       }
     ],
-    "totalSize": 3,
+    "totalSize": 4,
     "done": true
   },
   "warnings": []

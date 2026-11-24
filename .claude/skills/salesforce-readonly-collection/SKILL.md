@@ -9,7 +9,7 @@ user-invocable: false
 Collection is done by **one script per area**, never by hand:
 
 ```
-python -m collect area <area> --alias <alias> --snapshot snapshots/<alias>/<YYYY-MM-DD_HHMM> [--objects A,B]
+python -m collect area <area> --alias <alias> --snapshot snapshots/<alias>/<YYYY-MM-DD_HHMM> [--objects A,B] [--describe-custom]
 ```
 
 Areas: `licenses-users`, `permissions`, `objects-config`, `automations`, `limits`.
@@ -19,7 +19,8 @@ Areas: `licenses-users`, `permissions`, `objects-config`, `automations`, `limits
 - Runs a **fixed list** of read-only `sf` commands for the area (`collect/plan.py`):
   every SOQL file in `queries/<area>/` with `sf data query --file` (files ending in `.tooling.soql`
   add `--use-tooling-api`); `sf sobject list` and `sf sobject describe` for the listed objects
-  (objects-config); `sf org list limits` (limits). Nothing else can run.
+  (objects-config), plus every custom object found in the org with `--describe-custom`;
+  `sf org list limits` (limits). Nothing else can run.
 - **Checks every command with the read-only guardrail** (`check_command` in
   `.claude/hooks/guard_readonly.py`) before running any of them. `sf` runs inside the script, where
   Claude Code's hook cannot see it, so the script applies the same rules itself.

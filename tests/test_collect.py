@@ -129,3 +129,21 @@ def test_cli_exit_codes(tmp_path, monkeypatch, capsys):
     assert main(["area", "limits", "--alias", "demo", "--snapshot", snap]) == 2      # reuse refused
     monkeypatch.setattr(runner, "run_sf", FakeSf((1, b"", b"boom")))
     assert main(["area", "automations", "--alias", "demo", "--snapshot", snap]) == 1
+
+
+def test_describe_custom_adds_every_custom_object(tmp_path):
+    custom = json.dumps({"status": 0, "result": {"records": [
+        {"DeveloperName": "Library_Book", "NamespacePrefix": None},
+        {"DeveloperName": "Widget", "NamespacePrefix": "acme"}], "done": True}}).encode()
+    describe = json.dumps({"status": 0, "result": {"name": "X", "fields": []}}).encode()
+
+    def fake(args, cwd):
+        if "custom-objects.tooling.soql" in " ".join(args):
+            return 0, custom, b""
+        return 0, describe if "describe" in args else ok_query(1), b""
+    m = collect_area("objects-config", "demo", tmp_path / "s", objects=["Case", "Library_Book__c"],
+                     describe_custom=True, run=fake, sleep=lambda s: None)
+    names = [f["file"] for f in m["files"]]
+    assert names.count("describe-Library_Book__c.json") == 1            # no duplicate
+    assert "describe-acme__Widget__c.json" in names and "describe-Case.json" in names
+    assert all(f["status"] == "ok" for f in m["files"])

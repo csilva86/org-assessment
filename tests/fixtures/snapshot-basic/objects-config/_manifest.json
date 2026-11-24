@@ -2,14 +2,42 @@
   "area": "objects-config",
   "org_alias": "fixture",
   "snapshot": "tests/fixtures/snapshot-basic",
-  "collected_by": "collector-objects-config",
+  "collected_by": "python -m collect",
   "files": [
     {
-      "file": "sobjects.json",
-      "command": "(fixture)",
+      "file": "describe-Case.json",
+      "command": "(fixture) describe-Case.json",
       "ran_at": "2026-11-24T00:00:00Z",
       "status": "ok",
       "records": 0,
+      "attempts": 1,
+      "error": null
+    },
+    {
+      "file": "describe-Library_Book__c.json",
+      "command": "(fixture) describe-Library_Book__c.json",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "attempts": 1,
+      "error": null
+    },
+    {
+      "file": "organization.json",
+      "command": "(fixture) organization.json",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "attempts": 1,
+      "error": null
+    },
+    {
+      "file": "sobjects.json",
+      "command": "(fixture) sobjects.json",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "attempts": 1,
       "error": null
     }
   ]

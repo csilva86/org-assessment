@@ -1,0 +1,41 @@
+{
+  "status": 0,
+  "result": {
+    "name": "Case",
+    "label": "Case",
+    "custom": false,
+    "fields": [
+      {
+        "name": "Id",
+        "label": "Case ID",
+        "type": "id",
+        "custom": false,
+        "nillable": false,
+        "createable": false,
+        "defaultedOnCreate": true,
+        "calculated": false
+      },
+      {
+        "name": "Subject",
+        "label": "Subject",
+        "type": "string",
+        "length": 255,
+        "custom": false,
+        "nillable": true,
+        "createable": true,
+        "defaultedOnCreate": false,
+        "calculated": false
+      },
+      {
+        "name": "SLA_Tier__c",
+        "label": "SLA Tier",
+        "type": "picklist",
+        "custom": true,
+        "nillable": true,
+        "createable": true,
+        "defaultedOnCreate": false,
+        "calculated": false
+      }
+    ]
+  }
+}

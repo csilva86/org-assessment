@@ -1,0 +1,68 @@
+{
+  "status": 0,
+  "result": {
+    "name": "Library_Book__c",
+    "label": "Library Book",
+    "custom": true,
+    "fields": [
+      {
+        "name": "Id",
+        "label": "Record ID",
+        "type": "id",
+        "custom": false,
+        "nillable": false,
+        "createable": false,
+        "defaultedOnCreate": true,
+        "calculated": false
+      },
+      {
+        "name": "Title__c",
+        "label": "Title",
+        "type": "string",
+        "length": 255,
+        "custom": true,
+        "nillable": false,
+        "createable": true,
+        "defaultedOnCreate": false,
+        "calculated": false
+      },
+      {
+        "name": "Total_Copies__c",
+        "label": "Total Copies",
+        "type": "double",
+        "precision": 18,
+        "scale": 0,
+        "custom": true,
+        "nillable": true,
+        "createable": true,
+        "defaultedOnCreate": false,
+        "calculated": false
+      },
+      {
+        "name": "Owner_Account__c",
+        "label": "Owner",
+        "type": "reference",
+        "referenceTo": [
+          "Account"
+        ],
+        "custom": true,
+        "nillable": true,
+        "createable": true,
+        "defaultedOnCreate": false,
+        "calculated": false
+      },
+      {
+        "name": "Available__c",
+        "label": "Available",
+        "type": "double",
+        "precision": 18,
+        "scale": 0,
+        "custom": true,
+        "nillable": true,
+        "createable": false,
+        "defaultedOnCreate": false,
+        "calculated": true
+      }
+    ]
+  }
+}

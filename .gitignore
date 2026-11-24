@@ -16,3 +16,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .venv/
+
+# update packages delivered during development
+*.zip

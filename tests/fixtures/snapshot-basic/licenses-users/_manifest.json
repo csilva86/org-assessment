@@ -2,22 +2,33 @@
   "area": "licenses-users",
   "org_alias": "fixture",
   "snapshot": "tests/fixtures/snapshot-basic",
-  "collected_by": "collector-licenses-users",
+  "collected_by": "python -m collect",
   "files": [
     {
-      "file": "user-licenses.json",
-      "command": "(fixture)",
+      "file": "permission-set-licenses.json",
+      "command": "(fixture) permission-set-licenses.json",
       "ran_at": "2026-11-24T00:00:00Z",
       "status": "ok",
       "records": 0,
+      "attempts": 1,
       "error": null
     },
     {
-      "file": "permission-set-licenses.json",
-      "command": "(fixture)",
+      "file": "user-licenses.json",
+      "command": "(fixture) user-licenses.json",
       "ran_at": "2026-11-24T00:00:00Z",
       "status": "ok",
       "records": 0,
+      "attempts": 1,
+      "error": null
+    },
+    {
+      "file": "users.json",
+      "command": "(fixture) users.json",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "attempts": 1,
       "error": null
     }
   ]

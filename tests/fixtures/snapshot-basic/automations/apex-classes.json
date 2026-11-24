@@ -1,0 +1,30 @@
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "Id": "01p1",
+        "Name": "LegacyHelper",
+        "ApiVersion": 42.0,
+        "Status": "Active",
+        "NamespacePrefix": null
+      },
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "Id": "01p2",
+        "Name": "CaseService",
+        "ApiVersion": 62.0,
+        "Status": "Active",
+        "NamespacePrefix": null
+      }
+    ],
+    "totalSize": 2,
+    "done": true
+  },
+  "warnings": []
+}

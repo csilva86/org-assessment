@@ -1,6 +1,6 @@
 """
 Usage:
-    python -m collect area <area> --alias <alias> --snapshot <snapshots/alias/timestamp> [--objects A,B]
+    python -m collect area <area> --alias <alias> --snapshot <snapshots/alias/timestamp> [--objects A,B] [--describe-custom]
 
 Runs the area's read-only commands and writes <snapshot>/<area>/*.json, *.stderr.log and
 _manifest.json. Exit code 0 when every file is ok (or skipped), 1 when any failed, 2 when refused.
@@ -20,11 +20,13 @@ def main(argv=None):
     a.add_argument("--alias", required=True)
     a.add_argument("--snapshot", required=True)
     a.add_argument("--objects", default="", help="comma-separated objects to describe (objects-config)")
+    a.add_argument("--describe-custom", action="store_true",
+                   help="also describe every custom object found in the org (objects-config)")
     args = parser.parse_args(argv)
 
     objects = [o.strip() for o in args.objects.split(",") if o.strip()]
     try:
-        manifest = collect_area(args.area, args.alias, args.snapshot, objects)
+        manifest = collect_area(args.area, args.alias, args.snapshot, objects, describe_custom=args.describe_custom)
     except (CollectError, PlanError) as e:
         print(f"Not collected: {e}", file=sys.stderr)
         return 2

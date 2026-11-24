@@ -1,0 +1,22 @@
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "Id": "00D000000000FIX",
+        "Name": "Fixture Org",
+        "OrganizationType": "Developer Edition",
+        "InstanceName": "FIX1",
+        "IsSandbox": false,
+        "TrialExpirationDate": null,
+        "LanguageLocaleKey": "en_US"
+      }
+    ],
+    "totalSize": 1,
+    "done": true
+  },
+  "warnings": []
+}

@@ -2,22 +2,33 @@
   "area": "permissions",
   "org_alias": "fixture",
   "snapshot": "tests/fixtures/snapshot-basic",
-  "collected_by": "collector-permissions",
+  "collected_by": "python -m collect",
   "files": [
     {
-      "file": "permission-sets.json",
-      "command": "(fixture)",
+      "file": "assignments.json",
+      "command": "(fixture) assignments.json",
       "ran_at": "2026-11-24T00:00:00Z",
       "status": "ok",
       "records": 0,
+      "attempts": 1,
       "error": null
     },
     {
       "file": "object-permissions.json",
-      "command": "(fixture)",
+      "command": "(fixture) object-permissions.json",
       "ran_at": "2026-11-24T00:00:00Z",
       "status": "ok",
       "records": 0,
+      "attempts": 1,
+      "error": null
+    },
+    {
+      "file": "permission-sets.json",
+      "command": "(fixture) permission-sets.json",
+      "ran_at": "2026-11-24T00:00:00Z",
+      "status": "ok",
+      "records": 0,
+      "attempts": 1,
       "error": null
     }
   ]

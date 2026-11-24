@@ -40,8 +40,9 @@ requirements, and documents the org. It never changes the org.
    Each result is `met`, `partial` or `not_met`, with severity and evidence.
 4. **Output** — client summary (business language), consultant detail, and `gaps.json`
    (input for the future development pipeline). Markdown is the source; PDF/HTML for delivery.
-5. **Org documentation** — data dictionary, permission matrix, automation map, licenses and
-   limits, and a methodology appendix, from the same snapshot.
+5. **Org documentation** — `python -m orgdoc build <snapshot>`: overview, licenses and users (counted,
+   never named), data dictionary, permission matrix, automation map, limits, and a methodology
+   appendix, from the same snapshot.
 6. **Second brain** — after a project, propose anonymised patterns for `brain/`. The
    consultant approves them before they are saved.
 

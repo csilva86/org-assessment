@@ -65,21 +65,23 @@ def _evaluate(stdout, stderr, code):
     return "failed", None, (lines[-1].strip() if lines else f"sf exited with code {code} and wrote nothing")
 
 
-def collect_area(area, alias, snapshot, objects=None, run=None, sleep=None, repo=REPO):
-    run = run or run_sf
-    sleep = sleep or time.sleep
-    snapshot = Path(snapshot)
-    folder = snapshot / area
-    if (folder / "_manifest.json").exists():
-        raise CollectError(f"{folder} already has a manifest. Never reuse a snapshot: start a new one.")
-    guard = _load_guard()
-    plan = steps(area, alias, repo, objects)
-    for _, args in plan:                              # refuse the whole area before running anything
-        reason = guard.check_command(shlex.join(args))
-        if reason:
-            raise CollectError(f"refused by the read-only guardrail: {reason}")
-    folder.mkdir(parents=True, exist_ok=True)
+def _custom_object_names(folder):
+    """API names of the custom objects listed in custom-objects.json (Tooling CustomObject)."""
+    try:
+        data = json.loads((folder / "custom-objects.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    if data.get("status") != 0:
+        return []
+    names = []
+    for rec in data["result"].get("records", []):
+        ns, dev = rec.get("NamespacePrefix"), rec.get("DeveloperName")
+        if dev:
+            names.append(f"{ns}__{dev}__c" if ns else f"{dev}__c")
+    return names
 
+
+def _run_steps(plan, run, sleep, repo, folder):
     files = []
     for name, args in plan:
         attempts, ran_at = 0, None
@@ -96,6 +98,39 @@ def collect_area(area, alias, snapshot, objects=None, run=None, sleep=None, repo
         status, records, error = _evaluate(out, err, code)
         files.append({"file": name, "command": shlex.join(args), "ran_at": ran_at, "status": status,
                       "records": records, "attempts": attempts, "error": error})
+    return files
+
+
+def _refuse_unsafe(guard, plan):
+    for _, args in plan:                              # refuse before running anything
+        reason = guard.check_command(shlex.join(args))
+        if reason:
+            raise CollectError(f"refused by the read-only guardrail: {reason}")
+
+
+def collect_area(area, alias, snapshot, objects=None, describe_custom=False, run=None, sleep=None, repo=REPO):
+    """Collect one area. With describe_custom (objects-config only), every custom object found in
+    custom-objects.json is described too, after the requested objects."""
+    run = run or run_sf
+    sleep = sleep or time.sleep
+    snapshot = Path(snapshot)
+    folder = snapshot / area
+    if (folder / "_manifest.json").exists():
+        raise CollectError(f"{folder} already has a manifest. Never reuse a snapshot: start a new one.")
+    guard = _load_guard()
+    objects = list(objects or [])
+    plan = steps(area, alias, repo, objects)
+    _refuse_unsafe(guard, plan)
+    folder.mkdir(parents=True, exist_ok=True)
+    files = _run_steps(plan, run, sleep, repo, folder)
+
+    if area == "objects-config" and describe_custom:
+        extra = [o for o in _custom_object_names(folder) if o not in objects]
+        if extra:
+            more = [s for s in steps(area, alias, repo, extra) if s[0].startswith("describe-")]
+            _refuse_unsafe(guard, more)
+            files += _run_steps(more, run, sleep, repo, folder)
+        objects += extra
 
     if area == "objects-config" and not objects:
         files.append({"file": "describe-<Object>.json", "command": None, "ran_at": utc_now(),

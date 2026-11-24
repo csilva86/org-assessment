@@ -1,0 +1,64 @@
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "Id": "005A",
+        "Name": "Ana Fictícia",
+        "IsActive": true,
+        "UserType": "Standard",
+        "Profile": {
+          "Name": "Support Profile",
+          "UserLicense": {
+            "Name": "Salesforce"
+          }
+        },
+        "UserRole": null,
+        "LastLoginDate": null,
+        "CreatedDate": "2026-01-01T00:00:00.000+0000"
+      },
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "Id": "005B",
+        "Name": "Bruno Inventado",
+        "IsActive": true,
+        "UserType": "Standard",
+        "Profile": {
+          "Name": "Support Profile",
+          "UserLicense": {
+            "Name": "Salesforce"
+          }
+        },
+        "UserRole": null,
+        "LastLoginDate": null,
+        "CreatedDate": "2026-01-01T00:00:00.000+0000"
+      },
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "Id": "005C",
+        "Name": "Carla Exemplo",
+        "IsActive": false,
+        "UserType": "Standard",
+        "Profile": {
+          "Name": "Standard User",
+          "UserLicense": {
+            "Name": "Salesforce"
+          }
+        },
+        "UserRole": null,
+        "LastLoginDate": null,
+        "CreatedDate": "2026-01-01T00:00:00.000+0000"
+      }
+    ],
+    "totalSize": 3,
+    "done": true
+  },
+  "warnings": []
+}

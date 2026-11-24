@@ -1,0 +1,20 @@
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "X"
+        },
+        "Id": "01q1",
+        "Name": "CaseTrigger",
+        "TableEnumOrId": "Case",
+        "Status": "Active",
+        "NamespacePrefix": null
+      }
+    ],
+    "totalSize": 1,
+    "done": true
+  },
+  "warnings": []
+}
