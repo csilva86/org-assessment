@@ -1,0 +1,1 @@
+SELECT Id, Name, Label, IsOwnedByProfile, Profile.Name, PermissionsModifyAllData, PermissionsViewAllData, PermissionsAuthorApex, PermissionsManageUsers, PermissionsCustomizeApplication, PermissionsApiEnabled FROM PermissionSet

@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(sf project deploy:*)",
+      "Bash(sf project delete:*)",
+      "Bash(sf apex run:*)",
+      "Bash(sf data create:*)",
+      "Bash(sf data update:*)",
+      "Bash(sf data delete:*)",
+      "Bash(sf data upsert:*)",
+      "Bash(sf data import:*)",
+      "Bash(sfdx:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/guard_readonly.py"],
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
+  }
+}

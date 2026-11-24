@@ -1,0 +1,18 @@
+# Client data never leaves this machine (guardrail 2)
+snapshots/*
+!snapshots/.gitkeep
+reports/*
+!reports/.gitkeep
+
+# Salesforce CLI local state
+.sf/
+.sfdx/
+
+# Claude Code personal settings
+.claude/settings.local.json
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/

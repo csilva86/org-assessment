@@ -1,0 +1,1 @@
+SELECT AssigneeId, PermissionSetId, PermissionSetGroupId FROM PermissionSetAssignment

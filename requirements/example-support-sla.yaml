@@ -1,0 +1,58 @@
+# EXAMPLE — a fictional project used to show the format. Not a real client.
+project: example-support-sla
+status: draft
+approved_by: null
+approved_on: null
+
+rules:
+  - id: BR-01
+    business_rule: "The support team needs to track every case against an SLA."
+    source: "Example kick-off meeting"
+    checks:
+      - id: BR-01.1
+        area: objects-config
+        what: "The Case object is available in the org."
+        how: code
+        severity: high
+        notes: ""
+      - id: BR-01.2
+        area: objects-config
+        what: "Entitlement management is enabled (the Entitlement and CaseMilestone objects exist)."
+        how: code
+        severity: high
+        notes: "Entitlements must be switched on in Setup before these objects appear."
+      - id: BR-01.3
+        area: permissions
+        what: "The support agents' permission sets give Read and Edit on Case and Read on Entitlement."
+        how: code
+        severity: high
+        notes: "Which permission sets belong to support agents is confirmed by the consultant."
+      - id: BR-01.4
+        area: automations
+        what: "No active legacy workflow rule or Process Builder process runs on Case."
+        how: code
+        severity: medium
+        notes: "Legacy automations on Case should be migrated to Flow before SLA processes are added."
+
+  - id: BR-02
+    business_rule: "Fifty agents will work cases at the same time."
+    source: "Example kick-off meeting"
+    checks:
+      - id: BR-02.1
+        area: licenses-users
+        what: "At least 50 user licenses that allow working cases are available (total minus used)."
+        how: code
+        severity: high
+        notes: "Which license types count is confirmed by the consultant."
+      - id: BR-02.2
+        area: limits
+        what: "Daily API requests have room for the expected integrations (less than 70% used)."
+        how: code
+        severity: low
+        notes: "70% is an example threshold."
+      - id: BR-02.3
+        area: permissions
+        what: "The permissions given to support agents fit their role (no Modify All Data, no Customize Application)."
+        how: judgement
+        severity: medium
+        notes: "The two named permissions are checked by code; whether the rest fits the role needs judgement."

@@ -1,0 +1,1 @@
+SELECT Id, Name, OrganizationType, InstanceName, IsSandbox, TrialExpirationDate, LanguageLocaleKey FROM Organization

@@ -1,0 +1,1 @@
+SELECT ApiName, Label, ProcessType, TriggerType, TriggerObjectOrEventLabel, IsActive, LastModifiedDate FROM FlowDefinitionView

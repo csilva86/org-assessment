@@ -1,0 +1,1 @@
+SELECT Id, Name, IsActive, UserType, Profile.Name, Profile.UserLicense.Name, UserRole.Name, LastLoginDate, CreatedDate FROM User

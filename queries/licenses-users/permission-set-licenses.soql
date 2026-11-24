@@ -1,0 +1,1 @@
+SELECT Id, MasterLabel, DeveloperName, Status, TotalLicenses, UsedLicenses, ExpirationDate FROM PermissionSetLicense

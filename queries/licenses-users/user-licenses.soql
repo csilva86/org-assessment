@@ -1,0 +1,1 @@
+SELECT Id, Name, Status, TotalLicenses, UsedLicenses, LicenseDefinitionKey FROM UserLicense
