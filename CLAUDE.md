@@ -27,8 +27,10 @@ requirements, and documents the org. It never changes the org.
 1. **Requirements** — business rules in `requirements/<project>.yaml` (format:
    `requirements/README.md`). The `requirements-translator` agent drafts the technical checks;
    the consultant approves.
-2. **Collection** — the collector agents run **in parallel**, one per area, and write JSON
-   into `snapshots/<org-alias>/<YYYY-MM-DD_HHMM>/<area>.json`:
+2. **Collection** — the collector agents run **in parallel**, one per area. Each one runs
+   `python -m collect area <area> ...` once; the script runs the read-only commands, checks each
+   with the guardrail, and writes the data and the manifest into
+   `snapshots/<org-alias>/<YYYY-MM-DD_HHMM>/<area>/`:
    - `collector-licenses-users`
    - `collector-permissions`
    - `collector-objects-config`
@@ -52,6 +54,7 @@ requirements, and documents the org. It never changes the org.
 - Snapshot folders are named after the alias: `snapshots/<alias>/<YYYY-MM-DD_HHMM>/`.
 - Never delete, move or rename files in `snapshots/` or `reports/`, even after a failed run.
   Start a new snapshot folder instead, and tell the consultant what can be cleaned up.
-- Read `.claude/skills/salesforce-readonly-collection/SKILL.md` before collecting.
+- Read `.claude/skills/salesforce-readonly-collection/SKILL.md` before collecting. Never collect
+  by running `sf` by hand: use `python -m collect`.
 - Code is Python 3, tested with pytest (`python -m pytest tests`).
 - Write in English in code, file names and reports' technical parts.

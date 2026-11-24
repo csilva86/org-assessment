@@ -23,7 +23,7 @@ asking the model nicely.
 
 | # | Guardrail | How it is enforced |
 | --- | --- | --- |
-| 1 | **Read-only.** The assessment never changes the org. | A `PreToolUse` hook ([`guard_readonly.py`](.claude/hooks/guard_readonly.py)) allows only an allowlist of read-only `sf` commands and blocks everything else, including chained commands, the legacy `sfdx` CLI, HTTP writes, write-like MCP tools and commands that print credentials. It fails closed. 62 tests cover it. |
+| 1 | **Read-only.** The assessment never changes the org. | A `PreToolUse` hook ([`guard_readonly.py`](.claude/hooks/guard_readonly.py)) allows only an allowlist of read-only `sf` commands and blocks everything else, including chained commands, the legacy `sfdx` CLI, HTTP writes, write-like MCP tools and commands that print credentials. It fails closed. 62 tests cover it. `python -m collect`, which runs `sf` outside the hook, checks every command with the same function. |
 | 2 | **Confidentiality between clients.** | `snapshots/` and `reports/` are git-ignored. The second brain stores patterns, never client data. |
 | 3 | **The consultant approves.** | Agents draft checks; nothing runs until the requirements file says `status: approved`. |
 | 4 | **Code before AI.** | Every check that can be exact is Python code with a reproducible result. AI is used only for judgement calls, and those are labelled. |
@@ -74,8 +74,10 @@ flowchart LR
    ([format](requirements/README.md), [example](requirements/example-support-sla.yaml)).
    Every check keeps the id of the rule it came from, so the report can say *"your SLA rule is
    not met because Entitlements are off"* instead of a loose technical list.
-2. **Collection** — five subagents, one per area, run the read-only `sf` commands and the
-   versioned [SOQL files](queries) in parallel, and save the raw JSON into a timestamped snapshot. Analysis never touches the live org, so
+2. **Collection** — five subagents run in parallel, one per area. Each runs
+   `python -m collect`, which executes a fixed plan of read-only `sf` commands and the versioned
+   [SOQL files](queries), checks every command with the guardrail, and writes the raw JSON and the
+   manifest into a timestamped snapshot. Analysis never touches the live org, so
    results are reproducible and before/after runs can be compared.
 3. **Analysis** — Python checks read the snapshot and return `met`, `partial` or `not_met`,
    with severity and evidence (`python -m checks run <requirements> <snapshot>`).
@@ -96,11 +98,12 @@ flowchart LR
 | [`.claude/hooks/guard_readonly.py`](.claude/hooks/guard_readonly.py) | Guardrail 1, in code |
 | [`.claude/agents/`](.claude/agents) | Five collector subagents and the requirements translator |
 | [`.claude/skills/`](.claude/skills) | `run-assessment` (the `/run-assessment` command) and the read-only collection reference |
+| [`collect/`](collect) | `python -m collect`: runs an area's read-only commands and writes the snapshot and manifest |
 | [`queries/`](queries) | The SOQL the collectors run, one query per file |
 | [`requirements/`](requirements) | Requirements format, a fictional example and the demo for the author's DigiLibrary org |
 | [`checks/`](checks) | Deterministic checks: six rule types, evidence for every result |
 | [`brain/`](brain) | The second brain: patterns only |
-| [`tests/`](tests) | Guardrail and checks tests, on fictional data only |
+| [`tests/`](tests) | Guardrail, collection and checks tests, on fictional data and a fake `sf` only |
 
 ## Getting started
 
@@ -141,8 +144,8 @@ In Claude Code:
       6 met, 1 partial, 2 not met, 1 for judgement
 - [x] Before/after: the two gaps (only System Administrator could use DigiLibrary) closed with a
       `DigiLibrary_Librarian` permission set; both checks went from not met to met
-- [ ] Manifests written by a script, not by the agents (agents wrote local time marked as UTC, and one
-      collector started before its folder existed; both worked around for now in the agents)
+- [x] Collection and manifests done by code (`python -m collect`), not by the agents: fixed command
+      plan, every command checked with the guardrail, clock timestamps, error logs, one safe retry
 - [x] Reports built by code from `results.json`: client summary (business language), consultant
       detail (evidence and recommended fix per check) and `gaps.json`
 - [ ] Reports as HTML/PDF for delivery

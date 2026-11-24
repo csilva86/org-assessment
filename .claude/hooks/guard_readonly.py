@@ -60,9 +60,12 @@ HTTP_WRITE = re.compile(r"(-X\s*(POST|PUT|PATCH|DELETE)|--request\s+(POST|PUT|PA
 SEGMENT_SPLIT = re.compile(r"\s*(?:&&|\|\||;|\||\n)\s*")
 
 
+class Blocked(Exception):
+    """Raised when a command could change the org or expose credentials."""
+
+
 def block(reason: str) -> None:
-    print(f"BLOCKED by read-only guardrail: {reason}", file=sys.stderr)
-    sys.exit(2)
+    raise Blocked(reason)
 
 
 # Shell redirections are not part of the command: `2>&1`, `>out.json`, `2> /dev/null`, `< in.txt`
@@ -167,20 +170,38 @@ def check_mcp(tool_name: str) -> None:
         block(f"the MCP tool `{tool_name}` looks like it writes to the org.")
 
 
+def check_command(command: str):
+    """Return None if `command` is allowed, or the reason it is blocked.
+    Used by this hook and by `python -m collect`, which runs `sf` itself (outside the hook)."""
+    try:
+        check_bash(command)
+    except Blocked as e:
+        return str(e)
+    return None
+
+
+def deny(reason: str) -> None:
+    print(f"BLOCKED by read-only guardrail: {reason}", file=sys.stderr)
+    sys.exit(2)
+
+
 def main() -> None:
     try:
         # Read bytes and decode as UTF-8 ourselves: on Windows, sys.stdin uses the local code page
         # (cp1252), which cannot read paths such as "Área de Trabalho".
         event = json.loads(sys.stdin.buffer.read().decode("utf-8"))
     except Exception:
-        block("could not read the hook input.")
+        deny("could not read the hook input.")
         return
     tool_name = event.get("tool_name", "")
     tool_input = event.get("tool_input") or {}
-    if tool_name in ("Bash", "PowerShell"):
-        check_bash(tool_input.get("command", ""))
-    elif tool_name.startswith("mcp__"):
-        check_mcp(tool_name)
+    try:
+        if tool_name in ("Bash", "PowerShell"):
+            check_bash(tool_input.get("command", ""))
+        elif tool_name.startswith("mcp__"):
+            check_mcp(tool_name)
+    except Blocked as e:
+        deny(str(e))
     sys.exit(0)
 
 

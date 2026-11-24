@@ -17,14 +17,14 @@ Requirements file: `$requirements` · Org alias: `$alias`
      `sf data query --file queries/objects-config/organization.soql --target-org $alias --json`
      and show the consultant the org name, Id, type and whether it is a sandbox. Wait for a yes
      before collecting. Never use `sf org display`: it prints the access token (the hook blocks it).
-2. **Create the snapshot folder and its five area folders** before starting any collector:
-   `snapshots/<alias>/<YYYY-MM-DD_HHMM>/{licenses-users,permissions,objects-config,automations,limits}/`.
-3. **Collect in parallel.** Start these five subagents at the same time, each with the alias
-   and the snapshot folder:
+2. **Choose the snapshot folder** `snapshots/<alias>/<YYYY-MM-DD_HHMM>/` (a new one, never reused).
+   The collectors' script creates it.
+3. **Collect in parallel.** Start these five subagents at the same time, each with the alias and
+   the snapshot folder:
    `collector-licenses-users`, `collector-permissions`, `collector-objects-config`,
    `collector-automations`, `collector-limits`.
    Give `collector-objects-config` the list of objects the approved checks mention (every object in
-   `objects_exist` and `object_access` rules). It describes exactly those.
+   `objects_exist` and `object_access` rules). Each subagent runs `python -m collect area ...` once.
 4. **Check the snapshot.** Every area has a `_manifest.json`. List any errors for the
    consultant before going on.
 5. **Analyse.** Run the deterministic checks:
