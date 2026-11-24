@@ -14,7 +14,7 @@ Always add `--target-org <alias> --json`.
 Run each query from its file:
 
 ```
-sf data query --file queries/<area>/<name>.soql --target-org <alias> --json > <snapshot>/<area>/<name>.json
+sf data query --file queries/<area>/<name>.soql --target-org <alias> --json > <snapshot>/<area>/<name>.json 2> <snapshot>/<area>/<name>.stderr.log
 ```
 
 - Files ending in `.tooling.soql` also take `--use-tooling-api`, and are saved as `<name>.json`
@@ -46,6 +46,7 @@ sf data query --file queries/<area>/<name>.soql --target-org <alias> --json > <s
       "ran_at": "2026-11-24T13:05:12Z",
       "status": "ok",
       "records": 192,
+      "attempts": 1,
       "error": null
     }
   ]
@@ -54,7 +55,10 @@ sf data query --file queries/<area>/<name>.soql --target-org <alias> --json > <s
 
 - `status`: `ok` (valid JSON with `"status": 0`), `failed` (anything else) or `skipped`
   (not run on purpose, e.g. describes without approved requirements; say why in `error`).
-- `ran_at`: ISO 8601 in UTC. `records`: number of records, or `null` when not a list.
+- `ran_at`: ISO 8601 in UTC, from `date -u +%Y-%m-%dT%H:%M:%SZ`. `records`: number of records, or `null`
+  when not a list. `attempts`: 1, or 2 after the single allowed retry.
+- Each file has a `<name>.stderr.log` next to it with `sf`'s error output (often empty). Quote the
+  relevant line in `error` when a command fails.
 - A check that needs a `failed` or `skipped` file reports `error`, never a verdict.
 
 ## Per area

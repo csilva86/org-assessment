@@ -28,6 +28,27 @@ asking the model nicely.
 | 4 | **Code before AI.** | Every check that can be exact is Python code with a reproducible result. AI is used only for judgement calls, and those are labelled. |
 | 5 | **Every conclusion has evidence.** | Each result points to the snapshot file and path that proves it. |
 
+## Guardrails in action
+
+Things that happened while building and testing this project on a real org:
+
+- **The consultant approves (3).** After the first run, two checks were changed to require a
+  librarian permission set instead of the Standard User profile, and the file was re-approved.
+  A comment left above the approval still said the file was "back to draft". On the next
+  `/run-assessment`, Claude stopped at step 1: it would not treat an approval that contradicted
+  the file as approval of the changed checks, and it would not change the status itself. It
+  asked the consultant to either confirm the new version or set it back to draft.
+- **Credentials stay out of the transcript (2).** The first end-to-end run confirmed the org with
+  `sf org display --json`, which printed the session's access token. Claude flagged it without
+  repeating it. The token was revoked, `/run-assessment` now confirms the org by querying the
+  `Organization` record, and the hook blocks `sf org display` and `sf org list auth`.
+- **The alias comes from the consultant.** When a run used an alias that did not exist on the
+  machine, the CLI suggested another one. None of the five collectors used it: they stopped and
+  asked.
+- **Read-only, enforced by code (1).** A blocked command is never retried another way. When the
+  hook wrongly blocked `sf --version 2>&1`, the agent stopped and reported it; the hook was fixed
+  (redirections are now ignored) and the case became a test.
+
 ## How it works
 
 ```mermaid
@@ -107,16 +128,20 @@ In Claude Code:
 
 ## Roadmap
 
-- [x] Guardrails, read-only hook and its tests
+- [x] Guardrails, read-only hook and its tests (including credential-printing commands)
 - [x] Collector subagents, the read-only command reference and the SOQL files
-- [x] First full collection on a Developer Edition org: 5 areas in parallel, 16 of 16 commands `ok`
-- [ ] One manifest format shared by all collectors (needed by the checks)
-- [x] Requirements format (draft) with a fictional example
-- [ ] Deterministic checks and `results.json`
+- [x] One manifest format shared by all collectors
+- [x] Requirements format with rule types, a fictional example and the DigiLibrary demo
+- [x] Deterministic checks: six rule types, `python -m checks run`, `results.json` with evidence
+- [x] End-to-end run with `/run-assessment` on the author's DigiLibrary org
+      ([requirements](requirements/demo-digilibrary.yaml)): 21 of 21 commands `ok`;
+      6 met, 1 partial, 2 not met, 1 for judgement
+- [x] Before/after: the two gaps (only System Administrator could use DigiLibrary) closed with a
+      `DigiLibrary_Librarian` permission set; both checks went from not met to met
+- [ ] Manifests written by a script, not by the agents (agents wrote local time marked as UTC, and one
+      collector started before its folder existed; both worked around for now in the agents)
 - [ ] Reports: client summary, consultant detail, `gaps.json`
 - [ ] Org documentation generator
-- [ ] Demo: a Developer Edition org with planted problems (too few licenses, excessive
-      permissions, legacy automations) and its published report
 - [ ] Second brain: pattern format and approval flow
 - [ ] Later: hand `gaps.json` to an orchestrated development pipeline and re-run the assessment
       to prove the gaps are closed

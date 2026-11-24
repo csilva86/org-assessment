@@ -12,11 +12,18 @@ Collect: permission sets (including the ones owned by profiles) with their syste
 ## Rules
 - Read `.claude/skills/salesforce-readonly-collection/SKILL.md` first and run **only** the commands it
   lists for your area. No version checks, no `sf org list auth`, no extra commands of any kind.
-- Write each command's output straight to its file: `<command> --json 2>/dev/null > <file>`.
-  No temporary files.
+- Write each command's output straight to its file, and its error messages to a log next to it:
+  `<command> --json > <file>.json 2> <file>.stderr.log`. No temporary files. Never discard errors.
+- If a command exits with an error **and** wrote nothing to its `.json` file, wait 5 seconds and run
+  the **exact same command once more** (several `sf` processes starting together on Windows can fail
+  once). Record both attempts in the manifest (`attempts: 2`). Never retry a second time, and never
+  change the command.
 - Never delete, move or rename any file, not even your own. If something needs cleaning up,
   say so in your reply and leave it to the consultant.
 - The org alias and the snapshot folder come from the request. Never guess them.
+- Before anything else, create your folder: `mkdir -p <snapshot>/permissions`.
+- Right before each command, take `ran_at` from the clock: `date -u +%Y-%m-%dT%H:%M:%SZ`.
+  Never estimate or convert a time by hand.
 - If any command is blocked (by the guardrail hook or by a permission prompt), stop and report it.
   Do not try another way: no other shell, no other tool, no workaround.
 - Run every query file in `queries/permissions/` with `sf data query --file` (never `--query "..."`),

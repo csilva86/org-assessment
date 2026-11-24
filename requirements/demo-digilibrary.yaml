@@ -1,6 +1,9 @@
 # DEMO — requirements for the author's own Developer Edition org, which runs the DigiLibrary app
 # (https://github.com/csilva86/DigiLibrary). No client data. Used to show a real run end to end.
 project: demo-digilibrary
+# History: BR-01.2 and BR-01.3 were changed on 2026-11-24 after the first run, to require access through
+# the DigiLibrary_Librarian permission set (consultant's recommendation). The approval below covers
+# this version of the rules.
 status: approved
 approved_by: Carlos Silva
 approved_on: 2026-11-24
@@ -19,18 +22,18 @@ rules:
         notes: ""
       - id: BR-01.2
         area: permissions
-        what: "Standard users can read, create and edit books."
+        what: "Librarians (DigiLibrary_Librarian permission set) can read, create and edit books."
         how: code
         severity: high
-        rule: {type: object_access, permission_sets: [Standard User], object: Library_Book__c, access: [read, create, edit]}
-        notes: "Assumes librarians use the Standard User profile. Confirm before approving."
+        rule: {type: object_access, permission_sets: [DigiLibrary_Librarian], object: Library_Book__c, access: [read, create, edit]}
+        notes: "First run (profile Standard User): not met, only System Administrator had access. Recommendation: grant access through a permission set, not the profile."
       - id: BR-01.3
         area: permissions
-        what: "Standard users can read and create loans."
+        what: "Librarians (DigiLibrary_Librarian permission set) can read and create loans."
         how: code
         severity: high
-        rule: {type: object_access, permission_sets: [Standard User], object: Library_Book_Loan__c, access: [read, create]}
-        notes: ""
+        rule: {type: object_access, permission_sets: [DigiLibrary_Librarian], object: Library_Book_Loan__c, access: [read, create]}
+        notes: "Same recommendation as BR-01.2."
       - id: BR-01.4
         area: automations
         what: "No legacy workflow rule or Process Builder process runs on loans."
