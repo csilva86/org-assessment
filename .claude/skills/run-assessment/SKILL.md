@@ -32,7 +32,8 @@ Requirements file: `$requirements` · Org alias: `$alias`
    It writes `reports/<alias>/<timestamp>/results.json`. Show the consultant the summary it prints.
    Checks marked `needs_judgement` are for the consultant; you may add your reading of the
    evidence, clearly labelled as judgement.
-6. **Report.** *(Not built yet.)* Client summary, consultant detail and `gaps.json` in
-   `reports/<alias>/<timestamp>/`.
+6. **Report.** Step 5 already wrote, next to `results.json`: `client-summary.md`,
+   `consultant-detail.md` and `gaps.json`. Show the consultant the client summary and list the
+   gaps. Do not rewrite or "improve" the reports: they are built by code on purpose.
 
 Never skip step 1. Never run a check on the live org: only on the snapshot.

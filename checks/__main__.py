@@ -1,6 +1,10 @@
 """
 Usage:
     python -m checks run <requirements.yaml> <snapshot-folder> [--out <results.json>]
+    python -m checks report <results.json>
+
+`run` writes results.json and, next to it, the reports: client-summary.md,
+consultant-detail.md and gaps.json. `report` rebuilds the reports from an existing results.json.
 
 Default output: reports/<alias>/<timestamp>/results.json, mirroring the snapshot path
 (snapshots/<alias>/<timestamp>). `reports/` is git-ignored: results hold org data.
@@ -10,6 +14,7 @@ import json
 import sys
 from pathlib import Path
 
+from .report import write_all
 from .requirements import RequirementsError
 from .runner import run
 from .snapshot import SnapshotError
@@ -32,7 +37,19 @@ def main(argv=None):
     r.add_argument("requirements")
     r.add_argument("snapshot")
     r.add_argument("--out")
+    rp = sub.add_parser("report", help="rebuild the reports from an existing results.json")
+    rp.add_argument("results")
     args = parser.parse_args(argv)
+
+    if args.command == "report":
+        path = Path(args.results)
+        if not path.exists():
+            print(f"Not found: {path}", file=sys.stderr)
+            return 2
+        report = json.loads(path.read_text(encoding="utf-8"))
+        for f in write_all(report, path.parent):
+            print(f"Written: {f}")
+        return 0
 
     try:
         report = run(args.requirements, args.snapshot)
@@ -50,6 +67,8 @@ def main(argv=None):
     print(f"\n{c['met']} met · {c['partial']} partial · {c['not_met']} not met · "
           f"{c['needs_judgement']} need judgement · {c['error']} error(s)")
     print(f"Results: {out}")
+    for f in write_all(report, out.parent):
+        print(f"Report:  {f}")
     return 0
 
 

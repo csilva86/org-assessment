@@ -165,3 +165,60 @@ def test_cli_refuses_draft(capsys):
 def test_missing_snapshot_folder():
     with pytest.raises(SnapshotError):
         Snapshot("does/not/exist")
+
+
+# ---------------------------------------------------------------- reports
+from checks import report as rep
+
+
+def test_rule_level_verdicts():
+    assert rep.rule_status(["met", "met"]) == "met"
+    assert rep.rule_status(["met", "partial"]) == "partial"
+    assert rep.rule_status(["partial", "not_met"]) == "not_met"
+    assert rep.rule_status(["met", "error"]) == "error"
+    assert rep.rule_status(["needs_judgement"]) == "needs_judgement"
+    assert rep.rule_status(["met", "needs_judgement"]) == "met"
+
+
+def test_client_summary_speaks_business_language():
+    text = rep.client_summary(run(REQ, SNAP))
+    assert "Support tracks cases against an SLA." in text      # the client's own words
+    assert "0 of 2 business rules are met" in text
+    assert "BR-01.1" not in text and "evidence" not in text.split("---")[0].lower()
+    assert "Not met" in text
+
+
+def test_consultant_detail_has_evidence_and_fixes():
+    text = rep.consultant_detail(run(REQ, SNAP))
+    assert "### ❌ BR-01.4" in text
+    assert "`automations/workflow-rules.json`" in text
+    assert "Migrate the workflow rules and Process Builder processes on Case to Flow" in text
+    assert "Recommended: Review the evidence" in text           # judgement check
+
+
+def test_gaps_lists_only_what_is_not_met():
+    g = rep.gaps(run(REQ, SNAP))
+    ids = [x["check_id"] for x in g["gaps"]]
+    assert set(ids) == {"BR-01.2", "BR-01.3", "BR-01.4", "BR-02.1", "BR-02.3"}
+    assert ids[0].startswith("BR-01")                          # high severity first
+    assert all(x["recommendation"] and x["evidence"] for x in g["gaps"])
+    assert g["not_assessed"] == []
+
+
+def test_reports_are_reproducible(tmp_path):
+    report = run(REQ, SNAP)
+    a = [p.read_text(encoding="utf-8") for p in rep.write_all(report, tmp_path / "a")]
+    b = [p.read_text(encoding="utf-8") for p in rep.write_all(report, tmp_path / "b")]
+    assert a == b
+
+
+def test_run_writes_reports_and_report_rebuilds_them(tmp_path, capsys):
+    snap_dir = tmp_path / "snapshots" / "fixture" / "t1"
+    shutil.copytree(SNAP, snap_dir)
+    assert main(["run", str(REQ), str(snap_dir)]) == 0
+    folder = tmp_path / "reports" / "fixture" / "t1"
+    for name in ("results.json", "client-summary.md", "consultant-detail.md", "gaps.json"):
+        assert (folder / name).exists(), name
+    (folder / "client-summary.md").unlink()
+    assert main(["report", str(folder / "results.json")]) == 0
+    assert (folder / "client-summary.md").exists()

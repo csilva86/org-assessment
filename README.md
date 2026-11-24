@@ -13,7 +13,8 @@ pick up next.
 Part of the [CSLLABS](https://csllabs.com) portfolio · Salesforce × Claude Code line.
 
 > **Status: early stage.** Guardrails, parallel collection and deterministic checks work end to
-> end on a Developer Edition org. Reports and org documentation are next (see [Roadmap](#roadmap)).
+> end on a Developer Edition org, with reports for the client and the consultant. Org documentation
+> is next (see [Roadmap](#roadmap)).
 
 ## Guardrails
 
@@ -78,7 +79,9 @@ flowchart LR
    results are reproducible and before/after runs can be compared.
 3. **Analysis** — Python checks read the snapshot and return `met`, `partial` or `not_met`,
    with severity and evidence (`python -m checks run <requirements> <snapshot>`).
-4. **Output** — a client summary, a consultant report and `gaps.json`.
+4. **Output** — a client summary in business language, a consultant report with evidence and a
+   recommended fix per check, and `gaps.json`. All three are built by code, so the same results
+   always give the same reports.
 5. **Org documentation** — data dictionary, permission matrix, automation map, licenses and
    limits, plus a methodology appendix, built from the same snapshot.
 6. **Second brain** — anonymised patterns from past projects that make the next translation of
@@ -140,7 +143,9 @@ In Claude Code:
       `DigiLibrary_Librarian` permission set; both checks went from not met to met
 - [ ] Manifests written by a script, not by the agents (agents wrote local time marked as UTC, and one
       collector started before its folder existed; both worked around for now in the agents)
-- [ ] Reports: client summary, consultant detail, `gaps.json`
+- [x] Reports built by code from `results.json`: client summary (business language), consultant
+      detail (evidence and recommended fix per check) and `gaps.json`
+- [ ] Reports as HTML/PDF for delivery
 - [ ] Org documentation generator
 - [ ] Second brain: pattern format and approval flow
 - [ ] Later: hand `gaps.json` to an orchestrated development pipeline and re-run the assessment
