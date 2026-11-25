@@ -34,7 +34,37 @@
         "nillable": true,
         "createable": true,
         "defaultedOnCreate": false,
-        "calculated": false
+        "calculated": false,
+        "picklistValues": [
+          {
+            "active": true,
+            "defaultValue": false,
+            "label": "Gold",
+            "validFor": null,
+            "value": "Gold"
+          },
+          {
+            "active": true,
+            "defaultValue": true,
+            "label": "Silver",
+            "validFor": null,
+            "value": "Silver"
+          },
+          {
+            "active": true,
+            "defaultValue": false,
+            "label": "Bronze tier",
+            "validFor": null,
+            "value": "Bronze"
+          },
+          {
+            "active": false,
+            "defaultValue": false,
+            "label": "Legacy",
+            "validFor": null,
+            "value": "Legacy"
+          }
+        ]
       }
     ]
   }

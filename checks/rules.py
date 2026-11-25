@@ -45,6 +45,51 @@ def rule_objects_exist(snap, objects):
     }
 
 
+PICKLIST_MATCH = ("exact", "includes")
+PICKLIST_COMPARE = ("value", "label")
+
+
+def rule_picklist_values(snap, object, field, values, match="exact", compare="value", ordered=False):
+    """The active values of picklist `field` on `object` (from describe-<object>.json) are `values`.
+    match: exact (no other active values) or includes (others allowed). compare: the API value or
+    the label. ordered: the expected values appear in this order among the active ones."""
+    if match not in PICKLIST_MATCH:
+        raise ValueError(f"unknown match '{match}'; use {list(PICKLIST_MATCH)}")
+    if compare not in PICKLIST_COMPARE:
+        raise ValueError(f"unknown compare '{compare}'; use {list(PICKLIST_COMPARE)}")
+    name = f"describe-{object}"
+    describe = snap.load("objects-config", name)
+    fld = next((f for f in describe.get("fields", []) if f.get("name") == field), None)
+    if fld is None:
+        return {"status": "not_met", "summary": f"Field {object}.{field} not found.",
+                "evidence": [_ev(snap.ref("objects-config", name), {"field": field}, {"found": False})]}
+    active = [pv.get(compare) for pv in fld.get("picklistValues") or [] if pv.get("active")]
+    found = [v for v in values if v in active]
+    missing = [v for v in values if v not in active]
+    extra = [a for a in active if a not in values]
+    order_ok = [a for a in active if a in values] == found
+    problems = []
+    if missing:
+        problems.append("missing: " + ", ".join(missing))
+    if match == "exact" and extra:
+        problems.append("other active values: " + ", ".join(extra))
+    if ordered and not order_ok:
+        problems.append("order differs: " + ", ".join(a for a in active if a in values))
+    if not found:
+        status = "not_met"
+    elif problems:
+        status = "partial"
+    else:
+        status = "met"
+    summary = f"{len(found)} of {len(values)} expected values are active on {object}.{field}."
+    if problems:
+        summary += " " + "; ".join(problems) + "."
+    return {"status": status, "summary": summary,
+            "evidence": [_ev(snap.ref("objects-config", name),
+                             {"field": field, "picklistValues": {"active": True}, "compare": compare},
+                             {"active": active, "missing": missing, "extra": extra, "order_ok": order_ok})]}
+
+
 # ---------------------------------------------------------------- licenses-users
 def rule_licenses_available(snap, licenses, min_available):
     """Unused licenses (total minus used), summed over the named user licenses or permission
@@ -193,6 +238,7 @@ def rule_limit_usage_below(snap, limit, max_percent):
 
 RULES = {
     "objects_exist": rule_objects_exist,
+    "picklist_values": rule_picklist_values,
     "licenses_available": rule_licenses_available,
     "object_access": rule_object_access,
     "system_permissions_absent": rule_system_permissions_absent,
