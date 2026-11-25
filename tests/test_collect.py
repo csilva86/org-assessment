@@ -114,6 +114,15 @@ def test_bad_object_name_is_refused():
         steps("objects-config", "demo", runner.REPO, ["Case; deploy"])
 
 
+def test_objects_config_collects_opportunity_stages():
+    plan = dict(steps("objects-config", "demo", runner.REPO))
+    args = plan["opportunity-stages.json"]
+    assert args[:5] == ["sf", "data", "query", "--file", "queries/objects-config/opportunity-stages.soql"]
+    assert "--use-tooling-api" not in args
+    soql = (runner.REPO / "queries" / "objects-config" / "opportunity-stages.soql").read_text(encoding="utf-8")
+    assert "FROM OpportunityStage" in soql and all(f in soql for f in ("IsActive", "IsClosed", "IsWon"))
+
+
 def test_checks_can_read_what_collect_wrote(tmp_path):
     fake = FakeSf((0, ok_query(5), b""))
     collect_area("permissions", "demo", tmp_path / "snap", run=fake, sleep=lambda s: None)

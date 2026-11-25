@@ -19,7 +19,7 @@ set `ORG_ASSESSMENT_BROWSER` to choose the browser.
 | --- | --- |
 | `requirements.py` | Loads a requirements file and refuses it unless `status: approved` with `approved_by` and `approved_on` (guardrail 3) |
 | `snapshot.py` | Reads the snapshot; a file that is missing, `failed`, `skipped` or holds an `sf` error gives `error`, never a verdict |
-| `rules.py` | The six rule types (see `requirements/README.md`) |
+| `rules.py` | The seven rule types (see `requirements/README.md`) |
 | `runner.py` | Runs every check, keeps the link to its business rule, counts the results |
 | `report.py` | The three reports, built by code from `results.json`; fixes come from fixed templates per rule type |
 | `html_report.py` | The same reports as self-contained HTML pages (styles inline, nothing loaded from the internet) |

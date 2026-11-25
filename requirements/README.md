@@ -3,7 +3,7 @@
 One YAML file per project: `requirements/<project>.yaml`. It holds the client's business
 rules and, under each rule, the technical checks that prove whether the org meets it.
 
-> Status: v1. Six rule types; more are added as projects need them.
+> Status: v1. Seven rule types; more are added as projects need them.
 
 ## Who writes what
 
@@ -44,6 +44,7 @@ Each rule reads only the snapshot (`checks/rules.py`). Names are API names unles
 | `type` | Parameters | Met when |
 | --- | --- | --- |
 | `objects_exist` | `objects: [Case, Library_Book__c]` | every object exists |
+| `picklist_values` | `object: Opportunity`, `field: StageName`, `values: [Prospecting, Closed Won]`, optional `match: exact` (default; no other active values) or `includes`, `compare: value` (default; API value) or `label`, `ordered: false` | the active values in `describe-<object>.json` are `values`. Needs the object in `--objects` when objects-config is collected |
 | `licenses_available` | `licenses: [Salesforce, Service Cloud User]` (user license names or permission set license labels), `min_available: 50` | unused licenses (total minus used), summed, reach `min_available` |
 | `object_access` | `permission_sets: [Support_Agent, Standard User]` (permission set API name or label, or profile name), `object: Case`, `access: [read, create, edit, delete, view_all, modify_all]` | every permission set grants every access |
 | `system_permissions_absent` | `permission_sets: [...]`, `permissions: [PermissionsModifyAllData, PermissionsCustomizeApplication]` | none of them has any of those permissions |

@@ -1,0 +1,1 @@
+SELECT Id, ApiName, MasterLabel, IsActive, IsClosed, IsWon, SortOrder, DefaultProbability, ForecastCategoryName FROM OpportunityStage ORDER BY SortOrder

@@ -50,6 +50,11 @@ def recommend(result):
         missing = (result.get("evidence") or [{}])[0].get("values", {}).get("missing") or rule.get("objects", [])
         return (f"Make {_list(missing)} available: enable the Salesforce feature that provides it, "
                 "or deploy the custom object.")
+    if t == "picklist_values":
+        return (f"Align the active values of {rule.get('object')}.{rule.get('field')} with "
+                f"{_list(rule.get('values', []))}: add or activate the missing ones, deactivate the others"
+                + (" and reorder them" if rule.get("ordered") else "")
+                + ". Check record types and sales or support processes that limit the values too.")
     if t == "licenses_available":
         return (f"Free up or buy licenses of type {_list(rule.get('licenses', []))} until at least "
                 f"{rule.get('min_available')} are available. Frozen users still hold a license; deactivated users do not.")

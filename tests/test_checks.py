@@ -66,6 +66,32 @@ def test_objects_exist(snap):
     assert rules.rule_objects_exist(snap, ["Nope__c"])["status"] == "not_met"
 
 
+def test_picklist_values(snap):
+    pv = rules.rule_picklist_values
+    r = pv(snap, "Case", "SLA_Tier__c", ["Gold", "Silver", "Bronze"])
+    assert r["status"] == "met"                                  # inactive "Legacy" is ignored
+    assert r["evidence"][0]["file"] == "objects-config/describe-Case.json"
+    assert r["evidence"][0]["values"]["active"] == ["Gold", "Silver", "Bronze"]
+    r = pv(snap, "Case", "SLA_Tier__c", ["Gold", "Silver"])
+    assert r["status"] == "partial" and "other active values: Bronze" in r["summary"]
+    assert pv(snap, "Case", "SLA_Tier__c", ["Gold", "Silver"], match="includes")["status"] == "met"
+    r = pv(snap, "Case", "SLA_Tier__c", ["Gold", "Platinum"], match="includes")
+    assert r["status"] == "partial" and "missing: Platinum" in r["summary"]
+    assert pv(snap, "Case", "SLA_Tier__c", ["Legacy"])["status"] == "not_met"
+    r = pv(snap, "Case", "SLA_Tier__c", ["Silver", "Gold", "Bronze"], ordered=True)
+    assert r["status"] == "partial" and "order differs" in r["summary"]
+    assert pv(snap, "Case", "SLA_Tier__c", ["Silver", "Gold", "Bronze"])["status"] == "met"  # order ignored
+    assert pv(snap, "Case", "SLA_Tier__c", ["Gold", "Silver", "Bronze tier"], compare="label")["status"] == "met"
+    assert pv(snap, "Case", "SLA_Tier__c", ["Gold", "Silver", "Bronze tier"])["status"] == "partial"
+    assert pv(snap, "Case", "Ghost__c", ["Gold"])["status"] == "not_met"
+    with pytest.raises(SnapshotError):
+        pv(snap, "Opportunity", "StageName", ["Prospecting"])        # not described
+    with pytest.raises(ValueError):
+        pv(snap, "Case", "SLA_Tier__c", ["Gold"], match="some")
+    with pytest.raises(ValueError):
+        pv(snap, "Case", "SLA_Tier__c", ["Gold"], compare="id")
+
+
 def test_licenses_available(snap):
     r = rules.rule_licenses_available(snap, ["Salesforce", "Service Cloud User"], 50)
     assert r["status"] == "partial"           # 2 + 2 = 4 free, 50 needed

@@ -21,6 +21,9 @@ Areas: `licenses-users`, `permissions`, `objects-config`, `automations`, `limits
   add `--use-tooling-api`); `sf sobject list` and `sf sobject describe` for the listed objects
   (objects-config), plus every custom object found in the org with `--describe-custom`;
   `sf org list limits` (limits). Nothing else can run.
+  objects-config also queries `OpportunityStage` (stage flags: closed, won, active, order) into
+  `opportunity-stages.json`. In an org without Opportunities that query fails: the area exits with
+  code 1 and a `FAILED opportunity-stages.json` line, which only matters if a check needs that file.
 - **Checks every command with the read-only guardrail** (`check_command` in
   `.claude/hooks/guard_readonly.py`) before running any of them. `sf` runs inside the script, where
   Claude Code's hook cannot see it, so the script applies the same rules itself.

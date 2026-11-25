@@ -108,7 +108,7 @@ flowchart LR
 | [`orgdoc/`](orgdoc) | `python -m orgdoc build`: the org documentation, from a snapshot |
 | [`queries/`](queries) | The SOQL the collectors run, one query per file |
 | [`requirements/`](requirements) | Requirements format, a fictional example and the demo for the author's DigiLibrary org |
-| [`checks/`](checks) | Deterministic checks: six rule types, evidence for every result |
+| [`checks/`](checks) | Deterministic checks: seven rule types, evidence for every result |
 | [`brain/`](brain) | The second brain: pattern format, client-data scan, `python -m brain check / list / approve`, approved patterns |
 | [`tests/`](tests) | Guardrail, collection, checks, reports, documentation and second-brain tests, on fictional data and a fake `sf` only |
 
@@ -147,7 +147,7 @@ In Claude Code:
 - [x] Collector subagents, the read-only command reference and the SOQL files
 - [x] One manifest format shared by all collectors
 - [x] Requirements format with rule types, a fictional example and the DigiLibrary demo
-- [x] Deterministic checks: six rule types, `python -m checks run`, `results.json` with evidence
+- [x] Deterministic checks: seven rule types, `python -m checks run`, `results.json` with evidence
 - [x] End-to-end run with `/run-assessment` on the author's DigiLibrary org
       ([requirements](requirements/demo-digilibrary.yaml)): 21 of 21 commands `ok`;
       6 met, 1 partial, 2 not met, 1 for judgement
